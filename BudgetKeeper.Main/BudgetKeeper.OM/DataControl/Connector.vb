@@ -1,5 +1,5 @@
 ﻿Imports BudgetKeeperEntity
-Imports BudgetKeeper.OM
+Imports BudgetKeeper.BudgetKeeper
 
 Public Class Connector
 	Implements IDisposable

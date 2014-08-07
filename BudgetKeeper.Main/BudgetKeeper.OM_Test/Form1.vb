@@ -1,4 +1,4 @@
-﻿Imports BudgetKeeper.OM
+﻿Imports BudgetKeeper.BudgetKeeper
 
 Public Class frm_OM_Test
 

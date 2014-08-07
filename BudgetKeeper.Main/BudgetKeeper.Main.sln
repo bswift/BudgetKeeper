@@ -1,17 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BudgetKeeper.OM", "BudgetKeeper.OM\BudgetKeeper.OM.vbproj", "{17DF4C08-D262-405B-B1D7-913C87EA3281}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BudgetKeeper.Web", "BudgetKeeper.Web\BudgetKeeper.Web.csproj", "{F3DDE8BE-BE44-422D-9A59-F19E0AE1D80D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utilities", "Utilities", "{C5A73436-7664-47F3-8BBB-EC5767821C9E}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BudgetKeeper.OM_Test", "BudgetKeeper.OM_Test\BudgetKeeper.OM_Test.vbproj", "{DFE35FF0-3AF9-494B-8487-F0ADE3510F4F}"
-EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "BudgetKeeper.Entity", "BudgetKeeper.Entity\BudgetKeeper.Entity.vbproj", "{CD409439-9E88-43A7-B3BF-F21B4BCB938F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{91D5FB3C-ABC6-45ED-A9E4-570BD2F0F15C}"
 	ProjectSection(SolutionItems) = preProject
@@ -19,6 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{91D5FB
 		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BudgetKeeper.Web", "BudgetKeeper.Web\BudgetKeeper.Web.csproj", "{93AC4412-EFBA-4412-90FD-D495F5D93001}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,18 +28,14 @@ Global
 		{17DF4C08-D262-405B-B1D7-913C87EA3281}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17DF4C08-D262-405B-B1D7-913C87EA3281}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17DF4C08-D262-405B-B1D7-913C87EA3281}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F3DDE8BE-BE44-422D-9A59-F19E0AE1D80D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F3DDE8BE-BE44-422D-9A59-F19E0AE1D80D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F3DDE8BE-BE44-422D-9A59-F19E0AE1D80D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F3DDE8BE-BE44-422D-9A59-F19E0AE1D80D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DFE35FF0-3AF9-494B-8487-F0ADE3510F4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DFE35FF0-3AF9-494B-8487-F0ADE3510F4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFE35FF0-3AF9-494B-8487-F0ADE3510F4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFE35FF0-3AF9-494B-8487-F0ADE3510F4F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CD409439-9E88-43A7-B3BF-F21B4BCB938F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CD409439-9E88-43A7-B3BF-F21B4BCB938F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CD409439-9E88-43A7-B3BF-F21B4BCB938F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CD409439-9E88-43A7-B3BF-F21B4BCB938F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{93AC4412-EFBA-4412-90FD-D495F5D93001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{93AC4412-EFBA-4412-90FD-D495F5D93001}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{93AC4412-EFBA-4412-90FD-D495F5D93001}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{93AC4412-EFBA-4412-90FD-D495F5D93001}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

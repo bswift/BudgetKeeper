@@ -1,6 +1,6 @@
 ﻿Imports System.Data.SqlClient
 Imports System.Reflection
-Imports BudgetKeeper.OM.Objects
+Imports BudgetKeeper.Objects
 
 Friend Class SQL
 	Const ConnStr As String = "Persist Security Info=True;Initial Catalog=Budget_Keeper;Data Source=(local)\sqlexpress;Integrated Security=SSPI;MultipleActiveResultSets=True;"
@@ -205,6 +205,14 @@ Friend Class SQL
 
 #Region "Entry"
 
+    Public Function GetObject_Entry(ByVal EntryID As Long) As Entry
+        Return Nothing
+    End Function
+
+    Public Function GetCollection_Entry(ByVal Filter As _BaseFilter, Optional ByRef ThisCount As Integer = 0) As Objects.EntryCollection
+        Return Nothing
+    End Function
+
 	Friend Function SaveObject_Entry(ByVal thisE As Entry) As Long
 		Dim QueryStr As String = ""
 		'If Not String.IsNullOrEmpty(thisE.FullName) Then userStr &= "Name = " & thisE.FullName
@@ -235,8 +243,15 @@ Friend Class SQL
 
 #End Region
 
-
 #Region "Location"
+
+    Function GetObject_Location(ByVal LocationID As Integer) As Location
+        Return Nothing
+    End Function
+
+    Function GetCollection_Location(ByVal Filter As _BaseFilter, Optional ByRef ThisCount As Integer = 0) As LocationCollection
+        Return Nothing
+    End Function
 
 	Friend Function SaveObject_Location(ByVal thisL As Location) As Long
 		Dim QueryStr As String = ""
@@ -269,6 +284,14 @@ Friend Class SQL
 #End Region
 
 #Region "Category"
+
+    Function GetObject_Category(ByVal CategoryID As Integer) As Category
+        Return Nothing
+    End Function
+
+    Function GetCollection_Category(ByVal Filter As _BaseFilter) As CategoryCollection
+        Return Nothing
+    End Function
 
 	Friend Function SaveObject_Category(ByVal thisL As Category) As Long
 		Dim QueryStr As String = ""

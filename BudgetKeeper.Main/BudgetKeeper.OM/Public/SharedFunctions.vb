@@ -1,5 +1,5 @@
 ﻿Imports System.Web
-Imports BudgetKeeper.OM
+Imports BudgetKeeper.BudgetKeeper
 
 Public Class SharedFunctions
 

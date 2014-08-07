@@ -24,6 +24,26 @@
 			End Set
 		End Property
 
+        Private m_Name As String
+        Public Property Name As String
+            Get
+                Return m_Name
+            End Get
+            Set(value As String)
+                m_Name = value
+            End Set
+        End Property
+
+        Private m_Description As String
+        Public Property Description As String
+            Get
+                Return m_Description
+            End Get
+            Set(value As String)
+                m_Description = value
+            End Set
+        End Property
+
 #End Region
 
 	End Class
@@ -48,7 +68,38 @@
 	End Class
 
 	Public Class CategoryFilter
-		Inherits _BaseFilter
+        Inherits _BaseFilter
+
+        Private m_Name As String = ""
+        Public Property Name As String
+            Get
+                Return m_Name
+            End Get
+            Set(value As String)
+                m_Name = value
+            End Set
+        End Property
+
+        Private m_Description As String = ""
+        Public Property Description As String
+            Get
+                Return m_Description
+            End Get
+            Set(value As String)
+                m_Description = value
+            End Set
+        End Property
+
+        Private m_Status As New Generic.List(Of Integer)
+        Public Property Status As Generic.List(Of Integer)
+            Get
+                Return m_Status
+            End Get
+            Set(value As Generic.List(Of Integer))
+                m_Status = value
+            End Set
+        End Property
+
 	End Class
 
 End Namespace

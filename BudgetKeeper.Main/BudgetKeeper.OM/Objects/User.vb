@@ -151,6 +151,16 @@
 			End Set
 		End Property
 
+        Private m_Image As Byte() = Nothing
+        Public Property Image As Byte()
+            Get
+                Return m_Image
+            End Get
+            Set(ByVal value As Byte())
+                m_Image = value
+            End Set
+        End Property
+
 #End Region
 
 #Region "Other Methods"
@@ -161,7 +171,6 @@
 		End Sub
 
 		Public Overrides Sub Clean()
-			Me.m_Entries = Nothing
 
 			MyBase.Clean()
 		End Sub
