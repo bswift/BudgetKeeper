@@ -20,13 +20,13 @@
 		Try
 			Select Case obj.ObjectType
 				Case Enumerations.ObjectType.User
-					SaveUser(obj)
+					Return SaveUser(obj)
 				Case Enumerations.ObjectType.Entry
-					SaveEntry(obj)
+					Return SaveEntry(obj)
 				Case Enumerations.ObjectType.Location
-					SaveLocation(obj)
+					Return SaveLocation(obj)
 				Case Enumerations.ObjectType.Category
-					SaveCategory(obj)
+					Return SaveCategory(obj)
 				Case Else
 					Throw New Exception("Object not a valid type to save: " & obj.ObjectType.ToString())
 			End Select
@@ -40,6 +40,14 @@
 		Dim objID As Long = 0
 		If m_LoginID <> 0 Then
 			If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginID = obj.UserID Then
+				Dim enc As New Encryption.AES
+				enc.IV = m_IV
+				enc.Key = m_Key
+				If obj.UserID = 0 AndAlso obj.SaveID = 0 Then
+					obj.SetCreatedDate(DateTime.Now)
+					obj.SetLastLogin(DateTime.Now)
+				End If
+				obj.Password = enc.EncryptString(obj.Password)
 				objID = m_SQL.SaveObject_User(obj)
 			End If
 		Else
@@ -309,7 +317,6 @@
             Throw New Exception(String.Format("Entry with ID {0} not found in system.", InEntry.ID))
         End If
 
-        HydrateEntry(InEntry, e)
     End Sub
 
     Private Sub GetLocation(ByRef InLocation As Objects.Location)
@@ -318,7 +325,6 @@
             Throw New Exception(String.Format("Location with ID {0} not found in system.", InLocation.ID))
         End If
 
-        HydrateLocation(InLocation, l)
     End Sub
 
     Private Sub GetCategory(ByRef InCategory As Objects.Category)
@@ -327,74 +333,6 @@
             Throw New Exception(String.Format("User with ID {0} not found in system.", InCategory.ID))
         End If
 
-        HydrateCategory(InCategory, c)
-    End Sub
-
-#End Region
-
-#Region "Hydration"
-
-    Private Sub HydrateUser(ByRef SecureUser As Objects.User, ByRef ReturnedUser As Objects.User)
-        'SecureUser.SetID(ReturnedUser.UserID)
-
-        'Dim fname As String = ""
-        'Dim lname As String = ""
-        'Dim foundswitch As Boolean = False
-        'Dim lastchar As String = ""
-        'Dim lastcharsquared As String = ""
-        'For i As Integer = 0 To ReturnedUser.Name.Length - 1
-        '	Dim thischar As String = ReturnedUser.Name.Substring(i, 1)
-        '	If foundswitch Then
-        '		lname &= thischar
-        '	Else
-        '		If lastchar = " " AndAlso thischar = " " Then ' space supposed to be there, add a temp value
-        '			lastchar = "~"
-        '			lastcharsquared = "~"
-        '			Continue For
-        '		ElseIf lastchar = " " AndAlso thischar <> " " AndAlso lastcharsquared <> " " Then
-        '			fname = fname.Substring(0, fname.Length - 1)
-        '			foundswitch = True
-        '			lname += thischar
-        '			Continue For
-        '		End If
-
-        '		fname &= thischar
-        '		lastcharsquared = lastchar
-        '		lastchar = thischar
-        '	End If
-        'Next
-
-        'SecureUser.FirstName = fname.Replace("  ", " ")
-        'SecureUser.LastName = lname.Replace("  ", " ")
-        'SecureUser.FullName = String.Format("{0} {1}", SecureUser.FirstName, SecureUser.LastName)
-
-
-        'If ReturnedUser.UserID = m_LoginID Then
-        '	SecureUser.Email = ReturnedUser.Email
-        '	SecureUser.Phone = ReturnedUser.Phone
-        '	If ReturnedUser.LastLogin <> Nothing Then SecureUser.SetLastLogin(ReturnedUser.LastLogin)
-        'End If
-
-        'SecureUser.Status = ReturnedUser.Status
-    End Sub
-
-    Private Sub HydrateEntry(ByRef SecureEntry As Objects.Entry, ByRef ReturnedEntry As Objects.Entry)
-        SecureEntry.SetID(ReturnedEntry.EntryID)
-
-
-        SecureEntry.Status = ReturnedEntry.Status
-    End Sub
-
-    Private Sub HydrateLocation(ByRef SecureLocation As Objects.Location, ByRef ReturnedLocation As Objects.Location)
-        SecureLocation.SetID(ReturnedLocation.LocationID)
-
-        SecureLocation.Status = ReturnedLocation.Status
-    End Sub
-
-    Private Sub HydrateCategory(ByRef SecureCategory As Objects.Category, ByRef ReturnedCategory As Objects.Category)
-        SecureCategory.SetID(ReturnedCategory.CategoryID)
-
-        SecureCategory.Status = ReturnedCategory.Status
     End Sub
 
 #End Region
@@ -437,7 +375,6 @@
 
             For Each u As Objects.User In ucoll
                 Dim tempU As New Objects.User
-                'HydrateUser(tempU, u)
                 InUserColl.Add(tempU)
             Next
         End If
@@ -460,7 +397,6 @@
 
             For Each e As Objects.Entry In ecoll
                 Dim tempE As New Objects.Entry
-                HydrateEntry(tempE, e)
                 InEntryColl.Add(tempE)
             Next
         End If
@@ -483,7 +419,6 @@
 
             For Each l As Objects.Location In lcoll
                 Dim tempL As New Objects.Location
-                HydrateLocation(tempL, l)
                 InLocationColl.Add(tempL)
             Next
         End If
@@ -506,7 +441,6 @@
 
             For Each c As Objects.Category In ccoll
                 Dim tempC As New Objects.Category
-                HydrateCategory(tempC, c)
                 InCategoryColl.Add(tempC)
             Next
         End If
@@ -515,7 +449,6 @@
     End Function
 
 #End Region
-
 
 #Region "Get Counts"
 

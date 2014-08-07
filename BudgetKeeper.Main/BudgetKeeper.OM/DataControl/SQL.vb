@@ -176,56 +176,92 @@ Friend Class SQL
 	Friend Function SaveObject_User(ByVal thisU As User) As Long
         Dim QueryStr As String = ""
 
-        If thisU.UserID > 0 AndAlso thisU.SaveID > 0 Then
-            If thisU.UserID = 0 Then thisU.UserID = thisU.SaveID
-            If Not String.IsNullOrEmpty(thisU.FullName) Then QueryStr &= "Name = '" & thisU.FullName & "'"
-            If Not String.IsNullOrEmpty(thisU.Username) Then QueryStr &= ", Username = '" & thisU.Username & "'"
-            If Not String.IsNullOrEmpty(thisU.Password) Then QueryStr &= ", Password = '" & thisU.Password & "'"
-            If thisU.UserType <> Enumerations.UserType.Unknown Then QueryStr &= ", UserType = " & thisU.UserType.ToString()
-            If Not String.IsNullOrEmpty(thisU.Email) Then QueryStr &= ", Email = '" & thisU.Email & "'"
-            If Not String.IsNullOrEmpty(thisU.Phone) Then QueryStr &= ", Phone = '" & thisU.Phone & "'"
-            If thisU.CreatedDate <> CDate("1/1/2000") Then QueryStr &= ", CreatedDate = '" & thisU.CreatedDate.ToString() & "'"
-            If thisU.LastLogin <> CDate("1/1/2000") Then QueryStr &= ", LastLogin = '" & thisU.LastLogin.ToString() & "'"
-            If thisU.Status <> Enumerations.UserStatus.Unknown Then QueryStr &= ", Status = " & CType(thisU.Status, Integer).ToString()
-            QueryStr &= " WHERE UserID = " & thisU.UserID
-            Using conn As New SqlConnection(ConnStr)
-                Using command As New SqlCommand(String.Format("UPDATE Users SET {0}", QueryStr), conn)
-                    command.CommandType = System.Data.CommandType.Text
-                    conn.Open()
-                    command.ExecuteNonQuery()
-                    conn.Close()
-                End Using
-            End Using
-        Else
-            QueryStr &= " (Username, Password, UserType, Name, Email, Phone, CreatedDate, LastLogin, Status) "
-            Dim Query2 As String = " VALUES ("
-            If Not String.IsNullOrEmpty(thisU.FullName) Then
-                Query2 &= thisU.FullName & ", "
-            Else
-                Query2 &= "NULL, "
-            End If
-            If Not String.IsNullOrEmpty(thisU.Username) Then
-                Query2 &= thisU.Username & ", "
-            End If
-            If Not String.IsNullOrEmpty(thisU.Password) Then QueryStr &= ", Password = '" & thisU.Password & "'"
-            If thisU.UserType <> Enumerations.UserType.Unknown Then QueryStr &= ", UserType = " & thisU.UserType.ToString()
-            If Not String.IsNullOrEmpty(thisU.Email) Then QueryStr &= ", Email = '" & thisU.Email & "'"
-            If Not String.IsNullOrEmpty(thisU.Phone) Then QueryStr &= ", Phone = '" & thisU.Phone & "'"
-            If thisU.CreatedDate <> CDate("1/1/2000") Then QueryStr &= ", CreatedDate = '" & thisU.CreatedDate.ToString() & "'"
-            If thisU.LastLogin <> CDate("1/1/2000") Then QueryStr &= ", LastLogin = '" & thisU.LastLogin.ToString() & "'"
-            If thisU.Status <> Enumerations.UserStatus.Unknown Then QueryStr &= ", Status = " & CType(thisU.Status, Integer).ToString()
-            Using conn As New SqlConnection(ConnStr)
-                Using command As New SqlCommand(String.Format("INSERT INTO Users SET {0}", QueryStr), conn)
-                    command.CommandType = System.Data.CommandType.Text
-                    conn.Open()
-                    command.ExecuteNonQuery()
-                    conn.Close()
-                End Using
-            End Using
-        End If
+		If thisU.UserID > 0 OrElse thisU.SaveID > 0 Then
+			If thisU.UserID = 0 Then thisU.UserID = thisU.SaveID
+			If Not String.IsNullOrEmpty(thisU.FullName) Then QueryStr &= "Name = '" & thisU.FullName & "'"
+			If Not String.IsNullOrEmpty(thisU.Username) Then QueryStr &= ", Username = '" & thisU.Username & "'"
+			If Not String.IsNullOrEmpty(thisU.Password) Then QueryStr &= ", Password = '" & thisU.Password & "'"
+			If thisU.UserType <> Enumerations.UserType.Unknown Then QueryStr &= ", UserType = " & thisU.UserType.ToString()
+			If Not String.IsNullOrEmpty(thisU.Email) Then QueryStr &= ", Email = '" & thisU.Email & "'"
+			If Not String.IsNullOrEmpty(thisU.Phone) Then QueryStr &= ", Phone = '" & thisU.Phone & "'"
+			If thisU.CreatedDate <> CDate("1/1/2000") Then QueryStr &= ", CreatedDate = '" & thisU.CreatedDate.ToString() & "'"
+			If thisU.LastLogin <> CDate("1/1/2000") Then QueryStr &= ", LastLogin = '" & thisU.LastLogin.ToString() & "'"
+			If thisU.Status <> Enumerations.UserStatus.Unknown Then QueryStr &= ", Status = " & CType(thisU.Status, Integer).ToString()
+			QueryStr &= " WHERE UserID = " & thisU.UserID
+			Using conn As New SqlConnection(ConnStr)
+				Using command As New SqlCommand(String.Format("UPDATE Users SET {0}", QueryStr), conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					command.ExecuteNonQuery()
+					conn.Close()
+				End Using
+			End Using
+		Else
+			' Create a new user '
+			QueryStr &= "Username, Password, UserType, Name, Email, Phone, CreatedDate, LastLogin, Status"
+			Dim Query2 As String = ""
+			If Not String.IsNullOrEmpty(thisU.Username) Then
+				Query2 &= "'" & thisU.Username & "', "
+			End If
+			If Not String.IsNullOrEmpty(thisU.Password) Then
+				Query2 &= "'" & thisU.Password & "', "
+			Else
+				Query2 &= "NULL, "
+			End If
+			If thisU.UserType <> Nothing AndAlso thisU.UserType <> Enumerations.UserType.Unknown Then
+				Query2 &= thisU.UserType.ToString() & ", "
+			Else
+				Query2 &= "NULL, "
+			End If
+			If Not String.IsNullOrEmpty(thisU.FullName) Then
+				Query2 &= "'" & thisU.FullName & "', "
+			Else
+				Query2 &= "NULL, "
+			End If
+			If Not String.IsNullOrEmpty(thisU.Email) Then
+				Query2 &= "'" & thisU.Email & "', "
+			Else
+				Query2 &= "NULL, "
+			End If
+			If Not String.IsNullOrEmpty(thisU.Phone) Then
+				Query2 &= "'" & thisU.Phone & "', "
+			Else
+				Query2 &= "NULL, "
+			End If
+			If thisU.CreatedDate <> Nothing AndAlso thisU.CreatedDate <> CDate("01/01/2000") Then
+				Query2 &= "'" & thisU.CreatedDate.ToString() & "', "
+			Else
+				Query2 &= "NULL, "
+			End If
+			If thisU.LastLogin <> Nothing AndAlso thisU.LastLogin <> CDate("01/01/2000") Then
+				Query2 &= "'" & thisU.LastLogin.ToString() & "', "
+			Else
+				Query2 &= "NULL, "
+			End If
+			If thisU.Status <> Nothing AndAlso thisU.Status <> Enumerations.UserStatus.Unknown Then
+				Query2 &= CType(thisU.Status, Integer).ToString()
+			Else
+				Query2 &= "NULL"
+			End If
+			
+			Using conn As New SqlConnection(ConnStr)
+				Using command As New SqlCommand(String.Format("INSERT INTO Users ({0}) VALUES ({1});", QueryStr, Query2), conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					command.ExecuteNonQuery()
+					command.CommandText = "SELECT TOP 1 UserID FROM Users ORDER BY UserID DESC"
+					Using reader = command.ExecuteReader()
+						While reader.Read
+							If Not IsDBNull(reader("UserID")) Then thisU.SetID(reader("UserID"))
+						End While
+					End Using
+					conn.Close()
+				End Using
+			End Using
+		End If
 
-        Return Nothing
-    End Function
+		Return thisU.UserID
+	End Function
 
 #End Region
 
@@ -241,15 +277,6 @@ Friend Class SQL
 
 	Friend Function SaveObject_Entry(ByVal thisE As Entry) As Long
 		Dim QueryStr As String = ""
-		'If Not String.IsNullOrEmpty(thisE.FullName) Then userStr &= "Name = " & thisE.FullName
-		'If Not String.IsNullOrEmpty(thisE.Username) Then userStr &= ", Username = " & thisE.Username
-		'If Not String.IsNullOrEmpty(thisE.Password) Then userStr &= ", Password = " & thisE.Password
-		'If thisE.UserType <> Enumerations.UserType.Unknown Then userStr &= ", UserType = " & thisE.UserType.ToString()
-		'If Not String.IsNullOrEmpty(thisE.Email) Then userStr &= ", Email = " & thisE.Email
-		'If Not String.IsNullOrEmpty(thisE.Phone) Then userStr &= ", Phone = " & thisE.Phone
-		'If thisE.CreatedDate <> CDate("1/1/2000") Then userStr &= ", CreatedDate = " & thisE.CreatedDate.ToString()
-		'If thisE.LastLogin <> CDate("1/1/2000") Then userStr &= ", LastLogin = " & thisE.LastLogin.ToString()
-		'If thisE.Status <> Enumerations.UserStatus.Unknown Then userStr &= ", Status = " & thisE.Status.ToString()
 
 		QueryStr &= "WHERE UserID = " & thisE.EntryID
 
