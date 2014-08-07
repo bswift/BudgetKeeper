@@ -205,9 +205,14 @@
 
             Dim thisuser As Objects.User = m_SQL.LogIn(Username, EncPass)
             thisuser.Password = ""
-            m_LoginType = thisuser.UserType
+            Dim tempDate As DateTime = thisuser.LastLogin
+            thisuser.SetLastLogin(DateTime.Now)
+            thisuser.SaveID = thisuser.UserID
             m_SQL.SaveObject_User(thisuser)
+            m_LoginType = thisuser.UserType
             m_LoginID = thisuser.UserID
+            thisuser.SaveID = 0
+            thisuser.SetLastLogin(tempDate)
 
             Return thisuser
         Catch ex As Exception

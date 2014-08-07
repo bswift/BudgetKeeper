@@ -22,7 +22,6 @@ Public Class Connector
 
 #End Region
 
-
 #Region "Base Collections"
 
 	Private m_Entries As Objects.EntryCollection = Nothing
@@ -90,7 +89,6 @@ Public Class Connector
 	End Property
 
 #End Region
-
 
 #Region "Public Helper Methods"
 
@@ -304,7 +302,6 @@ Public Class Connector
 	End Function
 
 #End Region
-
 
 #Region "Internal Helper Methods"
 
