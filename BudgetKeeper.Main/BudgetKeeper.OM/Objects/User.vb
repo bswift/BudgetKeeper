@@ -55,27 +55,27 @@
 			End Set
 		End Property
 
-		Private m_FullName As String = ""
-		Public Property FullName As String
-			Get
-				If String.IsNullOrEmpty(m_FirstName) Then
-					Return ""
-				ElseIf String.IsNullOrEmpty(m_LastName) Then
-					Return m_FirstName
-				Else
-					Return m_FirstName.Trim() & " " & m_LastName.Trim()
-				End If
-			End Get
-			Set(value As String)
-				If value.Split(" ").Length > 1 Then
-					m_FirstName = value.Split(" ")(0)
-					m_LastName = value.Split(" ")(1)
-				ElseIf value.Split(" ").Length = 1 Then
-					m_FirstName = value.Split(" ")(0)
-				End If
-				m_FullName = value
-			End Set
-		End Property
+        Private m_FullName As String = ""
+        Public Property FullName As String
+            Get
+                If String.IsNullOrEmpty(m_FirstName) Then
+                    Return ""
+                ElseIf String.IsNullOrEmpty(m_LastName) Then
+                    Return m_FirstName
+                Else
+                    Return m_FirstName.Trim() & " " & m_LastName.Trim()
+                End If
+            End Get
+            Set(value As String)
+                If value.Split(" ").Length > 1 Then
+                    m_FirstName = value.Split(" ")(0)
+                    m_LastName = value.Split(" ")(1)
+                ElseIf value.Split(" ").Length = 1 Then
+                    m_FirstName = value.Split(" ")(0)
+                End If
+                m_FullName = value
+            End Set
+        End Property
 
 		Private m_FirstName As String = ""
 		Public Property FirstName As String
@@ -243,6 +243,26 @@
 	Public Class UserFilter
 		Inherits _BaseFilter
 
+        Private m_UserID As Long = 0
+        Public Property UserID As Long
+            Get
+                Return m_UserID
+            End Get
+            Set(value As Long)
+                m_UserID = value
+            End Set
+        End Property
+
+        Private m_Username As String = ""
+        Public Property Username As String
+            Get
+                Return m_Username
+            End Get
+            Set(value As String)
+                m_Username = value
+            End Set
+        End Property
+
 		Private m_Name As String = ""
 		Public Property Name As String
 			Get
@@ -271,7 +291,67 @@
 			Set(value As String)
 				m_Phone = value
 			End Set
-		End Property
+        End Property
+
+        Private m_CreatedDateFrom As DateTime = CDate("01/01/2000")
+        Public Property CreatedDateFrom As DateTime
+            Get
+                Return m_CreatedDateFrom
+            End Get
+            Set(value As DateTime)
+                m_CreatedDateFrom = value
+            End Set
+        End Property
+
+        Private m_CreatedDateTo As DateTime = CDate("01/01/2000")
+        Public Property CreatedDateTo As DateTime
+            Get
+                Return m_CreatedDateTo
+            End Get
+            Set(value As DateTime)
+                m_CreatedDateTo = value
+            End Set
+        End Property
+
+        Private m_LastLoginFrom As DateTime = CDate("01/01/2000")
+        Public Property LastLoginFrom As DateTime
+            Get
+                Return m_LastLoginFrom
+            End Get
+            Set(value As DateTime)
+                m_LastLoginFrom = value
+            End Set
+        End Property
+
+        Private m_LastLoginTo As DateTime = CDate("01/01/2000")
+        Public Property LastLoginTo As DateTime
+            Get
+                Return m_LastLoginTo
+            End Get
+            Set(value As DateTime)
+                m_LastLoginTo = value
+            End Set
+        End Property
+
+        Private m_LocationID As Long = 0
+        Public Property LocationID As Long
+            Get
+                Return m_LocationID
+            End Get
+            Set(value As Long)
+                m_LocationID = value
+            End Set
+        End Property
+
+        Private m_CategoryID As Long = 0
+        Public Property CategoryID As Long
+            Get
+                Return m_LocationID
+            End Get
+            Set(value As Long)
+                m_CategoryID = value
+            End Set
+        End Property
 
 		Private m_Status As New Generic.List(Of Integer)
 		Public Property Status As Generic.List(Of Integer)

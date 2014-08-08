@@ -319,13 +319,13 @@ Public Class Connector
 		InObject.SetBaseConnector(Me)
 	End Sub
 
-	Friend Sub GetBaseCollection(ByRef InColl As Objects._BaseCollection)
-		If Not Me.LoggedIn Then Throw New Exception("You have not logged in with valid credentials, you are not allowed to get or save data.")
+    Friend Sub GetBaseCollection(ByRef InColl As Objects._BaseCollection)
+        If Not Me.LoggedIn Then Throw New Exception("You have not logged in with valid credentials, you are not allowed to get or save data.")
 
-		m_Security.GetSecureCollection(InColl)
+        m_Security.GetSecureCollection(InColl)
 
-		InColl.SetBaseConnector(Me)
-	End Sub
+        InColl.SetBaseConnector(Me)
+    End Sub
 
 	Friend Function GetCollectionCount(ByRef InColl As Objects._BaseCollection) As Integer
 		Return m_Security.GetSecureCount(InColl)

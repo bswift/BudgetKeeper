@@ -20,130 +20,130 @@
 		Try
 			Select Case obj.ObjectType
 				Case Enumerations.ObjectType.User
-					Return SaveUser(obj)
-				Case Enumerations.ObjectType.Entry
-					Return SaveEntry(obj)
-				Case Enumerations.ObjectType.Location
-					Return SaveLocation(obj)
-				Case Enumerations.ObjectType.Category
-					Return SaveCategory(obj)
-				Case Else
-					Throw New Exception("Object not a valid type to save: " & obj.ObjectType.ToString())
-			End Select
-		Catch ex As Exception
-			Throw ex
-		End Try
-		Return 0
-	End Function
+                    Return SaveUser(obj)
+                Case Enumerations.ObjectType.Entry
+                    Return SaveEntry(obj)
+                Case Enumerations.ObjectType.Location
+                    Return SaveLocation(obj)
+                Case Enumerations.ObjectType.Category
+                    Return SaveCategory(obj)
+                Case Else
+                    Throw New Exception("Object not a valid type to save: " & obj.ObjectType.ToString())
+            End Select
+        Catch ex As Exception
+            Throw ex
+        End Try
+        Return 0
+    End Function
 
-	Public Function SaveUser(ByVal obj As Objects.User) As Long
-		Dim objID As Long = 0
-		If m_LoginID <> 0 Then
-			If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginID = obj.UserID Then
-				Dim enc As New Encryption.AES
-				enc.IV = m_IV
-				enc.Key = m_Key
-				If obj.UserID = 0 AndAlso obj.SaveID = 0 Then
-					obj.SetCreatedDate(DateTime.Now)
-					obj.SetLastLogin(DateTime.Now)
-				End If
-				obj.Password = enc.EncryptString(obj.Password)
-				objID = m_SQL.SaveObject_User(obj)
-			End If
-		Else
-			Throw New Exception("You must be logged in to save.")
-		End If
-		Return objID
-	End Function
+    Public Function SaveUser(ByVal obj As Objects.User) As Long
+        Dim objID As Long = 0
+        If m_LoginID <> 0 Then
+            If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginID = obj.UserID Then
+                Dim enc As New Encryption.AES
+                enc.IV = m_IV
+                enc.Key = m_Key
+                If obj.UserID = 0 AndAlso obj.SaveID = 0 Then
+                    obj.SetCreatedDate(DateTime.Now)
+                    obj.SetLastLogin(DateTime.Now)
+                End If
+                obj.Password = enc.EncryptString(obj.Password)
+                objID = m_SQL.SaveObject_User(obj)
+            End If
+        Else
+            Throw New Exception("You must be logged in to save.")
+        End If
+        Return objID
+    End Function
 
-	Public Function SaveEntry(ByVal obj As Objects.Entry) As Long
-		Dim objID As Long = 0
-		If m_LoginID <> 0 Then
-			If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor Then
-				objID = m_SQL.SaveObject_Entry(obj)
-			End If
-		Else
-			Throw New Exception("You must be logged in to save.")
-		End If
-		Return objID
-	End Function
+    Public Function SaveEntry(ByVal obj As Objects.Entry) As Long
+        Dim objID As Long = 0
+        If m_LoginID <> 0 Then
+            If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor Then
+                objID = m_SQL.SaveObject_Entry(obj)
+            End If
+        Else
+            Throw New Exception("You must be logged in to save.")
+        End If
+        Return objID
+    End Function
 
-	Public Function SaveLocation(ByVal obj As Objects.Location) As Long
-		Dim objID As Long = 0
-		If m_LoginID <> 0 Then
-			If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor Then
-				objID = m_SQL.SaveObject_Location(obj)
-			End If
-		Else
-			Throw New Exception("You must be logged in to save.")
-		End If
-		Return objID
-	End Function
+    Public Function SaveLocation(ByVal obj As Objects.Location) As Long
+        Dim objID As Long = 0
+        If m_LoginID <> 0 Then
+            If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor Then
+                objID = m_SQL.SaveObject_Location(obj)
+            End If
+        Else
+            Throw New Exception("You must be logged in to save.")
+        End If
+        Return objID
+    End Function
 
-	Public Function SaveCategory(ByVal obj As Objects.Category) As Long
-		Dim objID As Long = 0
-		If m_LoginID <> 0 Then
-			If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor Then
-				objID = m_SQL.SaveObject_Category(obj)
-			End If
-		Else
-			Throw New Exception("You must be logged in to save.")
-		End If
-		Return objID
-	End Function
+    Public Function SaveCategory(ByVal obj As Objects.Category) As Long
+        Dim objID As Long = 0
+        If m_LoginID <> 0 Then
+            If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor Then
+                objID = m_SQL.SaveObject_Category(obj)
+            End If
+        Else
+            Throw New Exception("You must be logged in to save.")
+        End If
+        Return objID
+    End Function
 
-	Friend Function DecryptSessionString(ByVal SessionString As String) As String()
-		Try
-			Dim enc As New Encryption.AES
-			enc.IV = m_IV
-			enc.Key = m_Key
-			Dim tempS As String = enc.DecryptString(SessionString)
+    Friend Function DecryptSessionString(ByVal SessionString As String) As String()
+        Try
+            Dim enc As New Encryption.AES
+            enc.IV = m_IV
+            enc.Key = m_Key
+            Dim tempS As String = enc.DecryptString(SessionString)
 
-			Dim SessionArray() As String
-			SessionArray = tempS.Split(",")
+            Dim SessionArray() As String
+            SessionArray = tempS.Split(",")
 
-			' now we are valid
-			Return SessionArray
-		Catch ex As Exception
-			Return Nothing
-		End Try
-	End Function
+            ' now we are valid
+            Return SessionArray
+        Catch ex As Exception
+            Return Nothing
+        End Try
+    End Function
 
-	Public Function RefreshSessionString(ByVal OldSession As String, ByVal ID As Long, ByVal LType As Enumerations.LoginType, ByVal UserIP As String) As String
-		Dim currentsess As String() = DecryptSessionString(OldSession)
+    Public Function RefreshSessionString(ByVal OldSession As String, ByVal ID As Long, ByVal LType As Enumerations.LoginType, ByVal UserIP As String) As String
+        Dim currentsess As String() = DecryptSessionString(OldSession)
 
-		If currentsess.Count <> 6 Then Throw New Exception("Could not refresh session, as previous session is not valid.")
+        If currentsess.Count <> 6 Then Throw New Exception("Could not refresh session, as previous session is not valid.")
 
-		Dim ThisID As Long = currentsess(0)
-		Dim ThisType As Integer = currentsess(1)
-		Dim FormedDate As Date = currentsess(2)
-		FormedDate = FormedDate.AddHours(2)
-		Dim SKey As String = currentsess(3)
-		Dim IP As String = currentsess(4)
+        Dim ThisID As Long = currentsess(0)
+        Dim ThisType As Integer = currentsess(1)
+        Dim FormedDate As Date = currentsess(2)
+        FormedDate = FormedDate.AddHours(2)
+        Dim SKey As String = currentsess(3)
+        Dim IP As String = currentsess(4)
 
-		If ThisID < 1 OrElse ThisID <> m_LoginID Then Throw New Exception("Old session failed to validate with currently logged in user.  Unable to refresh session.") ' Bad ID
-		If ThisType < 1 OrElse ThisType <> m_LoginType Then Throw New Exception("Old session failed to validate with currently logged in user.  Unable to refresh session.") ' Bad Type
-		If String.IsNullOrEmpty(IP) OrElse IP <> UserIP Then Throw New Exception("Old session failed to validate with currently logged in user.  Unable to refresh session.") ' No guid/id entered
-		If SKey <> m_SALT Then Throw New Exception("Old session failed to validate with currently logged in user.  Unable to refresh session.") ' bad salt value
-		If Date.Compare(Now, FormedDate) > 0 Then Throw New Exception("Old session already expired.  New login required to continue.") ' expired session
+        If ThisID < 1 OrElse ThisID <> m_LoginID Then Throw New Exception("Old session failed to validate with currently logged in user.  Unable to refresh session.") ' Bad ID
+        If ThisType < 1 OrElse ThisType <> m_LoginType Then Throw New Exception("Old session failed to validate with currently logged in user.  Unable to refresh session.") ' Bad Type
+        If String.IsNullOrEmpty(IP) OrElse IP <> UserIP Then Throw New Exception("Old session failed to validate with currently logged in user.  Unable to refresh session.") ' No guid/id entered
+        If SKey <> m_SALT Then Throw New Exception("Old session failed to validate with currently logged in user.  Unable to refresh session.") ' bad salt value
+        If Date.Compare(Now, FormedDate) > 0 Then Throw New Exception("Old session already expired.  New login required to continue.") ' expired session
 
-		' Now that the old session has been validated...refresh this shiz
-		' FORMAT: ID, LOGINTYPE, DATE, SALT, RANDOM GUID
-		Dim sString As String = String.Format("{0},{1},{2},{3},{4},{5}", ID, CType(LType, Integer), Now, m_SALT, UserIP)
+        ' Now that the old session has been validated...refresh this shiz
+        ' FORMAT: ID, LOGINTYPE, DATE, SALT, RANDOM GUID
+        Dim sString As String = String.Format("{0},{1},{2},{3},{4},{5}", ID, CType(LType, Integer), Now, m_SALT, UserIP)
 
-		Dim enc As New Encryption.AES
-		enc.IV = m_IV
-		enc.Key = m_Key
+        Dim enc As New Encryption.AES
+        enc.IV = m_IV
+        enc.Key = m_Key
 
-		sString = enc.EncryptString(sString)
+        sString = enc.EncryptString(sString)
 
-		Return sString
-		Return Nothing
-	End Function
+        Return sString
+        Return Nothing
+    End Function
 
-	Friend Function CheckPass(ByVal UserID As Long, ByVal Password As String) As Boolean
-		Dim cleanEntity As Boolean = False ' preserves integrity of linq object in the case of inheritance
-		Try
+    Friend Function CheckPass(ByVal UserID As Long, ByVal Password As String) As Boolean
+        Dim cleanEntity As Boolean = False ' preserves integrity of linq object in the case of inheritance
+        Try
             'If m_SQL Is Nothing OrElse m_SQL.MyEntity Is Nothing Then
             '	SetEntity()
             '	cleanEntity = True
@@ -368,15 +368,15 @@
             m_SQL.GetCollection_User(InUserColl.m_Filter, thisct)
             Return thisct
         Else
-            Dim ucoll As Objects.UserCollection = m_SQL.GetCollection_User(InUserColl.m_Filter)
-            If ucoll Is Nothing Then
+            Dim tempCol As New Objects.UserCollection()
+            tempCol = m_SQL.GetCollection_User(InUserColl.m_Filter)
+
+            For Each u In tempCol
+                InUserColl.Add(u)
+            Next
+            If InUserColl Is Nothing Then
                 Throw New Exception(String.Format("An unexpected problem occurred during User fill."))
             End If
-
-            For Each u As Objects.User In ucoll
-                Dim tempU As New Objects.User
-                InUserColl.Add(tempU)
-            Next
         End If
 
         Return InUserColl.Count

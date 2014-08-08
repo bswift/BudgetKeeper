@@ -153,7 +153,7 @@
 		Public Sub New(ByRef ThisFilter As _BaseFilter, Optional ByVal AutoPopulate As Boolean = True)
 			m_ThisList = New Generic.List(Of _Base)
 			If ThisFilter IsNot Nothing Then m_Filter = ThisFilter
-			If ThisFilter IsNot Nothing AndAlso AutoPopulate Then Me.Populate(True)
+            If ThisFilter IsNot Nothing AndAlso AutoPopulate Then Me.Populate()
 		End Sub
 
 #End Region
@@ -341,30 +341,23 @@
 			Next
 		End Sub
 
-		Public Overridable Sub Populate(Optional ByVal GetExtraDetails As Boolean = False)
-			Dim c As Connector = FindConnector()
-			If c Is Nothing Then Throw New Exception("No connector found, cannot populate object.")
+        Public Overridable Sub Populate()
+            Dim c As Connector = FindConnector()
+            If c Is Nothing Then Throw New Exception("No connector found, cannot populate object.")
 
-			If m_Filter.CountOnly Then
-				m_ListCount = c.GetCollectionCount(Me)
-			Else
-				If GetExtraDetails Then
-					If Me.ExtraProperties.Contains("ExtraDetails") Then
-						Me.ExtraProperties("ExtraDetails") = True
-					Else
-						Me.ExtraProperties.Add("ExtraDetails", True)
-					End If
-				End If
+            If m_Filter.CountOnly Then
+                m_ListCount = c.GetCollectionCount(Me)
+            Else
+                Me.ExtraProperties("derp") = True
+                c.GetBaseCollection(Me)
 
-				c.GetBaseCollection(Me)
+                For Each item As _Base In Me
+                    item.ChangeFlag = Enumerations.ChangeFlag.NoChange
+                Next
 
-				For Each item As _Base In Me
-					item.ChangeFlag = Enumerations.ChangeFlag.NoChange
-				Next
-
-				m_ListCount = m_ThisList.Count
-			End If
-		End Sub
+                m_ListCount = m_ThisList.Count
+            End If
+        End Sub
 
 		Public Overridable Sub Clean()
 			Me.Parent = Nothing
