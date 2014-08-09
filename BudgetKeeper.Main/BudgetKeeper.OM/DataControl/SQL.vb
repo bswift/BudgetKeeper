@@ -428,18 +428,17 @@ Friend Class SQL
 
 		If thisE.EntryID > 0 OrElse thisE.SaveID > 0 Then
 			If thisE.EntryID = 0 Then thisE.EntryID = thisE.SaveID
-			If Not String.IsNullOrEmpty(thisE.Description) Then QueryStr &= "Description = '" & thisE.Description & "'"
-			If Not String.IsNullOrEmpty(thisE.Amount) Then QueryStr &= ", Amount = '" & thisE.Amount & "'"
-			If Not String.IsNullOrEmpty(thisE.CategoryID) Then QueryStr &= ", CategoryID = '" & thisE.CategoryID & "'"
-			If thisE.EntryType <> Enumerations.EntryType.Unknown Then QueryStr &= ", EntryType = " & thisE.EntryType.ToString()
-			If Not String.IsNullOrEmpty(thisE.Notes) Then QueryStr &= ", Notes = '" & thisE.Notes & "'"
-			If Not String.IsNullOrEmpty(thisE.LocationID) Then QueryStr &= ", LocationID = " & thisE.LocationID
-			If Not String.IsNullOrEmpty(thisE.CategoryID) Then QueryStr &= ", CategoryID = " & thisE.CategoryID
-			If Not String.IsNullOrEmpty(thisE.UserID) Then QueryStr &= ", UserID = " & thisE.UserID
-			If Not String.IsNullOrEmpty(thisE.UserType) Then QueryStr &= ", UserTYpe = " & thisE.UserType
-			If thisE.CreatedDate <> CDate("1/1/2000") Then QueryStr &= ", CreatedDate = '" & thisE.CreatedDate.ToString() & "'"
-			If thisE.Image IsNot Nothing AndAlso thisE.Image.Length > 0 Then QueryStr &= ", Image = " & System.Text.Encoding.UTF8.GetString(thisE.Image)
-			If thisE.Status <> Enumerations.EntryStatus.Unknown Then QueryStr &= ", Status = " & CType(thisE.Status, Integer).ToString()
+			If Not String.IsNullOrEmpty(thisE.Description) Then QueryStr &= String.Format("Description = '{0}'", thisE.Description)
+			If thisE.Amount > 0.0 Then QueryStr &= String.Format(", Amount = {0}", thisE.Amount.ToString())
+			If thisE.EntryType <> Enumerations.EntryType.Unknown Then QueryStr &= String.Format(", EntryType = {0}", thisE.EntryType.ToString())
+			If Not String.IsNullOrEmpty(thisE.Notes) Then QueryStr &= String.Format(", Notes = '{0}'", thisE.Notes)
+			If thisE.LocationID > 0 Then QueryStr &= String.Format(", LocationID = {0}", thisE.LocationID.ToString())
+			If thisE.CategoryID > 0 Then QueryStr &= String.Format(", CategoryID = {0}", thisE.CategoryID.ToString())
+			If thisE.UserID > 0 Then QueryStr &= String.Format(", UserID = {0}", thisE.UserID.ToString())
+			If thisE.UserType <> Nothing AndAlso thisE.UserType <> Enumerations.UserType.Unknown Then QueryStr &= String.Format(", UserTYpe = {0}", thisE.UserType.ToString())
+			If thisE.CreatedDate <> CDate("1/1/2000") Then QueryStr &= String.Format(", CreatedDate = '{0}'", thisE.CreatedDate.ToString())
+			If thisE.Image IsNot Nothing AndAlso thisE.Image.Length > 0 Then QueryStr &= String.Format(", Image = {0}", System.Text.Encoding.UTF8.GetString(thisE.Image))
+			If thisE.Status <> Enumerations.EntryStatus.Unknown Then QueryStr &= String.Format(", Status = {0}", CType(thisE.Status, Integer).ToString())
 			QueryStr &= " WHERE EntryID = " & thisE.EntryID
 			Using conn As New SqlConnection(ConnStr)
 				Dim sqltext As String = String.Format("UPDATE Entries SET {0}", QueryStr)
@@ -454,7 +453,7 @@ Friend Class SQL
 			' Create a new Entry '
 			QueryStr &= "Amount, EntryType, UserID, UserType, Description, Notes, LocationID, CategoryID, Image, CreatedDate, Status"
 			Dim Query2 As String = ""
-			If thisE.Amount > 0 Then Query2 &= thisE.Amount & ", " Else Query2 &= "0"
+			If thisE.Amount > 0.0 Then Query2 &= thisE.Amount & ", " Else Query2 &= "0"
 			If thisE.EntryType <> Nothing AndAlso thisE.EntryType <> Enumerations.EntryType.Unknown Then Query2 &= thisE.EntryType.ToString() & ", " Else Query2 &= "NULL, "
 			If thisE.UserID > 0 Then Query2 &= thisE.UserID & ", " Else Query2 &= "NULL, "
 			If thisE.UserType <> Nothing AndAlso thisE.UserType <> Enumerations.UserType.Unknown Then Query2 &= thisE.UserType.ToString() & ", " Else Query2 &= "NULL, "
@@ -486,7 +485,7 @@ Friend Class SQL
 		End If
 
 		Return thisE.EntryID
-    End Function
+	End Function
 
 	Private Sub HydrateEntry(ByRef obj As Entry, ByVal r As System.Data.SqlClient.SqlDataReader)
 
@@ -608,31 +607,57 @@ Friend Class SQL
 	End Function
 
     Friend Function SaveObject_Location(ByVal thisL As Location) As Long
-        Dim QueryStr As String = ""
-        'If Not String.IsNullOrEmpty(thisE.FullName) Then userStr &= "Name = " & thisE.FullName
-        'If Not String.IsNullOrEmpty(thisE.Username) Then userStr &= ", Username = " & thisE.Username
-        'If Not String.IsNullOrEmpty(thisE.Password) Then userStr &= ", Password = " & thisE.Password
-        'If thisE.UserType <> Enumerations.UserType.Unknown Then userStr &= ", UserType = " & thisE.UserType.ToString()
-        'If Not String.IsNullOrEmpty(thisE.Email) Then userStr &= ", Email = " & thisE.Email
-        'If Not String.IsNullOrEmpty(thisE.Phone) Then userStr &= ", Phone = " & thisE.Phone
-        'If thisE.CreatedDate <> CDate("1/1/2000") Then userStr &= ", CreatedDate = " & thisE.CreatedDate.ToString()
-        'If thisE.LastLogin <> CDate("1/1/2000") Then userStr &= ", LastLogin = " & thisE.LastLogin.ToString()
-        'If thisE.Status <> Enumerations.UserStatus.Unknown Then userStr &= ", Status = " & thisE.Status.ToString()
+		Dim QueryStr As String = ""
 
-        QueryStr &= "WHERE UserID = " & thisL.LocationID
+		If thisL.LocationID > 0 OrElse thisL.SaveID > 0 Then
+			If thisL.LocationID = 0 Then thisL.LocationID = thisL.SaveID
+			If Not String.IsNullOrEmpty(thisL.Description) Then QueryStr &= String.Format("Description = '{0}'", thisL.Description)
+			If thisL.LocationType <> Enumerations.LocationType.Unknown Then QueryStr &= String.Format(", LocationType = {0}", thisL.LocationType.ToString())
+			If Not String.IsNullOrEmpty(thisL.URL) Then QueryStr &= String.Format(", URL = '{0}'", thisL.URL)
+			If Not String.IsNullOrEmpty(thisL.Name) Then QueryStr &= String.Format(", Name = {0}", thisL.Name)
+			If thisL.Image IsNot Nothing AndAlso thisL.Image.Length > 0 Then QueryStr &= String.Format(", Image = {0}", System.Text.Encoding.UTF8.GetString(thisL.Image))
+			If thisL.Status <> Enumerations.LocationStatus.Unknown Then QueryStr &= String.Format(", Status = {0}", CType(thisL.Status, Integer).ToString())
+			QueryStr &= " WHERE LocationID = " & thisL.LocationID
+			Using conn As New SqlConnection(ConnStr)
+				Dim sqltext As String = String.Format("UPDATE Locations SET {0}", QueryStr)
+				Using command As New SqlCommand(sqltext, conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					command.ExecuteNonQuery()
+					conn.Close()
+				End Using
+			End Using
+		Else
+			' Create a new Location '
+			QueryStr &= "LocationType, Name, Description, URL, Image, Status"
+			Dim Query2 As String = ""
+			If thisL.LocationType <> Nothing AndAlso thisL.LocationType <> Enumerations.LocationType.Unknown Then Query2 &= thisL.LocationType.ToString() & ", " Else Query2 &= "NULL, "
+			If Not String.IsNullOrEmpty(thisL.Name) Then Query2 &= "'" & thisL.Name & "', " Else Query2 &= "NULL, "
+			If Not String.IsNullOrEmpty(thisL.Description) Then Query2 &= "'" & thisL.Description & "', " Else Query2 &= "NULL, "
+			If Not String.IsNullOrEmpty(thisL.URL) Then Query2 &= "'" & thisL.URL & "', " Else Query2 &= "NULL, "
+			If thisL.Image IsNot Nothing AndAlso thisL.Image.Length > 0 Then Query2 &= System.Text.Encoding.UTF8.GetString(thisL.Image) & ", " Else Query2 &= "NULL, "
+			If thisL.Status <> Nothing AndAlso thisL.Status <> Enumerations.LocationStatus.Unknown Then Query2 &= CType(thisL.Status, Integer).ToString() Else Query2 &= "NULL"
 
-        Using conn As New SqlConnection(ConnStr)
-            Using command As New SqlCommand(String.Format("UPDATE Locations SET {0}", QueryStr), conn)
-                command.CommandType = System.Data.CommandType.Text
-                conn.Open()
-                Using reader = command.ExecuteReader()
-                    While reader.Read
+			Using conn As New SqlConnection(ConnStr)
+				Using command As New SqlCommand(String.Format("INSERT INTO Locations ({0}) VALUES ({1});", QueryStr, Query2), conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					Dim RowsAffected As Integer = 0
+					RowsAffected = command.ExecuteNonQuery()
+					If RowsAffected > 0 Then
+						command.CommandText = "SELECT TOP 1 LocationID FROM Locations ORDER BY LocationID DESC"
+						Using reader = command.ExecuteReader()
+							While reader.Read
+								If Not IsDBNull(reader("LocationID")) Then thisL.SetID(reader("LocationID"))
+							End While
+						End Using
+					End If
+					conn.Close()
+				End Using
+			End Using
+		End If
 
-                    End While
-                End Using
-            End Using
-        End Using
-        Return Nothing
+		Return thisL.LocationID
     End Function
 
 	Private Sub HydrateLocation(ByRef obj As Location, ByVal r As System.Data.SqlClient.SqlDataReader)
@@ -744,33 +769,53 @@ Friend Class SQL
 		Return CatColl
 	End Function
 
-    Friend Function SaveObject_Category(ByVal thisL As Category) As Long
-        Dim QueryStr As String = ""
-        'If Not String.IsNullOrEmpty(thisE.FullName) Then userStr &= "Name = " & thisE.FullName
-        'If Not String.IsNullOrEmpty(thisE.Username) Then userStr &= ", Username = " & thisE.Username
-        'If Not String.IsNullOrEmpty(thisE.Password) Then userStr &= ", Password = " & thisE.Password
-        'If thisE.UserType <> Enumerations.UserType.Unknown Then userStr &= ", UserType = " & thisE.UserType.ToString()
-        'If Not String.IsNullOrEmpty(thisE.Email) Then userStr &= ", Email = " & thisE.Email
-        'If Not String.IsNullOrEmpty(thisE.Phone) Then userStr &= ", Phone = " & thisE.Phone
-        'If thisE.CreatedDate <> CDate("1/1/2000") Then userStr &= ", CreatedDate = " & thisE.CreatedDate.ToString()
-        'If thisE.LastLogin <> CDate("1/1/2000") Then userStr &= ", LastLogin = " & thisE.LastLogin.ToString()
-        'If thisE.Status <> Enumerations.UserStatus.Unknown Then userStr &= ", Status = " & thisE.Status.ToString()
+	Friend Function SaveObject_Category(ByVal thisC As Category) As Long
+		Dim QueryStr As String = ""
 
-        QueryStr &= "WHERE UserID = " & thisL.CategoryID
+		If thisC.CategoryID > 0 OrElse thisC.SaveID > 0 Then
+			If thisC.CategoryID = 0 Then thisC.CategoryID = thisC.SaveID
+			If Not String.IsNullOrEmpty(thisC.Description) Then QueryStr &= String.Format("Description = '{0}'", thisC.Description)
+			If Not String.IsNullOrEmpty(thisC.Name) Then QueryStr &= String.Format(", Name = {0}", thisC.Name)
+			If thisC.Status <> Enumerations.CategoryStatus.Unknown Then QueryStr &= String.Format(", Status = {0}", CType(thisC.Status, Integer).ToString())
+			QueryStr &= " WHERE CategoryID = " & thisC.CategoryID
+			Using conn As New SqlConnection(ConnStr)
+				Dim sqltext As String = String.Format("UPDATE Categories SET {0}", QueryStr)
+				Using command As New SqlCommand(sqltext, conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					command.ExecuteNonQuery()
+					conn.Close()
+				End Using
+			End Using
+		Else
+			' Create a new Category '
+			QueryStr &= "Name, Description, Status"
+			Dim Query2 As String = ""
+			If Not String.IsNullOrEmpty(thisC.Name) Then Query2 &= "'" & thisC.Name & "', " Else Query2 &= "NULL, "
+			If Not String.IsNullOrEmpty(thisC.Description) Then Query2 &= "'" & thisC.Description & "', " Else Query2 &= "NULL, "
+			If thisC.Status <> Nothing AndAlso thisC.Status <> Enumerations.CategoryStatus.Unknown Then Query2 &= CType(thisC.Status, Integer).ToString() Else Query2 &= "NULL"
 
-        Using conn As New SqlConnection(ConnStr)
-            Using command As New SqlCommand(String.Format("UPDATE Categories SET {0}", QueryStr), conn)
-                command.CommandType = System.Data.CommandType.Text
-                conn.Open()
-                Using reader = command.ExecuteReader()
-                    While reader.Read
+			Using conn As New SqlConnection(ConnStr)
+				Using command As New SqlCommand(String.Format("INSERT INTO Categories ({0}) VALUES ({1});", QueryStr, Query2), conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					Dim RowsAffected As Integer = 0
+					RowsAffected = command.ExecuteNonQuery()
+					If RowsAffected > 0 Then
+						command.CommandText = "SELECT TOP 1 CategoryID FROM Categories ORDER BY CategoryID DESC"
+						Using reader = command.ExecuteReader()
+							While reader.Read
+								If Not IsDBNull(reader("CategoryID")) Then thisC.SetID(reader("CategoryID"))
+							End While
+						End Using
+					End If
+					conn.Close()
+				End Using
+			End Using
+		End If
 
-                    End While
-                End Using
-            End Using
-        End Using
-        Return Nothing
-    End Function
+		Return thisC.CategoryID
+	End Function
 
 	Private Sub HydrateCategory(ByRef obj As Category, ByVal r As System.Data.SqlClient.SqlDataReader)
 		If Not IsDBNull(r("CategoryID")) Then obj.SetID(r("CategoryID"))
