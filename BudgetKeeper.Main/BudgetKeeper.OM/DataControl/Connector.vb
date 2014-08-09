@@ -1,7 +1,4 @@
-﻿Imports BudgetKeeperEntity
-Imports BudgetKeeper.BudgetKeeper
-
-Public Class Connector
+﻿Public Class Connector
 	Implements IDisposable
 
 #Region "Global Variables"
@@ -120,7 +117,7 @@ Public Class Connector
 		End Select
 
 		If inbase IsNot Nothing Then
-            inbase.SetID(ID)
+			inbase.SetID(ID)
 			GetBase(inbase)
 		End If
 
@@ -243,7 +240,7 @@ Public Class Connector
 			End If
 		Catch ex As Exception
 			LogOut()
-            Throw New Exception(ex.Message)
+			Throw New Exception(ex.Message)
 		End Try
 
 		Return Nothing
@@ -312,13 +309,13 @@ Public Class Connector
 		InObject.SetBaseConnector(Me)
 	End Sub
 
-    Friend Sub GetBaseCollection(ByRef InColl As Objects._BaseCollection)
-        If Not Me.LoggedIn Then Throw New Exception("You have not logged in with valid credentials, you are not allowed to get or save data.")
+	Friend Sub GetBaseCollection(ByRef InColl As Objects._BaseCollection)
+		If Not Me.LoggedIn Then Throw New Exception("You have not logged in with valid credentials, you are not allowed to get or save data.")
 
-        m_Security.GetSecureCollection(InColl)
+		m_Security.GetSecureCollection(InColl)
 
-        InColl.SetBaseConnector(Me)
-    End Sub
+		InColl.SetBaseConnector(Me)
+	End Sub
 
 	Friend Function GetCollectionCount(ByRef InColl As Objects._BaseCollection) As Integer
 		Return m_Security.GetSecureCount(InColl)

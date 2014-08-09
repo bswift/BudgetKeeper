@@ -77,11 +77,28 @@
 
 #End Region
 
+#Region "Methods"
+
+		Public Sub New()
+			m_ObjectType = Enumerations.ObjectType.Location
+		End Sub
+
+		Public Overrides Sub Clean()
+
+			MyBase.Clean()
+		End Sub
+
+		Public Overrides Sub Delete()
+			Me.Status = Enumerations.UserStatus.Deleted
+			MyBase.Delete()
+		End Sub
+
+#End Region
+
 	End Class
 
 	Public Class LocationCollection
 		Inherits _BaseCollection
-
 
 #Region "Properties"
 
@@ -95,6 +112,16 @@
 		End Property
 
 #End Region
+
+#Region "Methods"
+
+		Public Sub New()
+			m_Filter = New LocationFilter
+			m_ObjectType = Enumerations.ObjectType.Location
+		End Sub
+
+#End Region
+
 
 	End Class
 

@@ -14,7 +14,7 @@
 
 	Enum EntryType
 		Unknown = -1
-		Generic = 0
+		Generic = 1
 	End Enum
 
 	Enum LocationStatus
@@ -25,7 +25,7 @@
 
 	Enum LocationType
 		Unknown = -1
-		Generic = 0
+		Generic = 1
 	End Enum
 
 	Enum LoginType

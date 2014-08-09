@@ -127,7 +127,21 @@
 
         Friend Sub SetCreatedDate(ByVal ThisDate As Date)
             Me.m_CreatedDate = ThisDate
-        End Sub
+		End Sub
+
+		Public Sub New()
+			m_ObjectType = Enumerations.ObjectType.Entry
+		End Sub
+
+		Public Overrides Sub Clean()
+
+			MyBase.Clean()
+		End Sub
+
+		Public Overrides Sub Delete()
+			Me.Status = Enumerations.UserStatus.Deleted
+			MyBase.Delete()
+		End Sub
 
 #End Region
 
@@ -148,6 +162,16 @@
 		End Property
 
 #End Region
+
+#Region "Methods"
+
+		Public Sub New()
+			m_Filter = New EntryFilter
+			m_ObjectType = Enumerations.ObjectType.Entry
+		End Sub
+
+#End Region
+
 
 	End Class
 

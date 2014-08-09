@@ -187,7 +187,7 @@ Friend Class SQL
             Dim isfirst As Boolean = True
             For Each s As Long In Filter.Status
                 If isfirst Then isfirst = False Else FilterStr &= String.Format(" OR ")
-                FilterStr &= String.Format("Status = {0}", s)
+				FilterStr &= String.Format("[Status] = {0}", s)
             Next
             FilterStr &= String.Format(")")
         End If
@@ -250,7 +250,7 @@ Friend Class SQL
             If thisU.CreatedDate <> CDate("1/1/2000") Then QueryStr &= ", CreatedDate = '" & thisU.CreatedDate.ToString() & "'"
 			If thisU.LastLogin <> CDate("1/1/2000") Then QueryStr &= ", LastLogin = '" & thisU.LastLogin.ToString() & "'"
 			If thisU.Image IsNot Nothing AndAlso thisU.Image.Length > 0 Then QueryStr &= ", Image = " & System.Text.Encoding.UTF8.GetString(thisU.Image)
-            If thisU.Status <> Enumerations.UserStatus.Unknown Then QueryStr &= ", Status = " & CType(thisU.Status, Integer).ToString()
+			If thisU.Status <> Enumerations.UserStatus.Unknown Then QueryStr &= ", [Status] = " & CType(thisU.Status, Integer).ToString()
             QueryStr &= " WHERE UserID = " & thisU.UserID
             Using conn As New SqlConnection(ConnStr)
                 Dim sqltext As String = String.Format("UPDATE Users SET {0}", QueryStr)
@@ -263,7 +263,7 @@ Friend Class SQL
             End Using
         Else
             ' Create a new user '
-			QueryStr &= "Username, Password, UserType, Name, Email, Phone, CreatedDate, LastLogin, Image, Status"
+			QueryStr &= "Username, Password, UserType, Name, Email, Phone, CreatedDate, LastLogin, Image, [Status]"
             Dim Query2 As String = ""
             If Not String.IsNullOrEmpty(thisU.Username) Then  Query2 &= "'" & thisU.Username & "', "
 			If Not String.IsNullOrEmpty(thisU.Password) Then Query2 &= "'" & thisU.Password & "', " Else Query2 &= "NULL, "
@@ -301,7 +301,7 @@ Friend Class SQL
     Private Sub HydrateUser(ByRef obj As User, ByVal r As System.Data.SqlClient.SqlDataReader)
 
         If Not IsDBNull(r("UserID")) Then obj.SetID(r("UserID"))
-        If Not IsDBNull(r("Status")) Then obj.Status = r("Status")
+		If Not IsDBNull(r("Status")) Then obj.Status = r("Status")
         If Not IsDBNull(r("UserType")) Then obj.UserType = r("UserType")
         If Not IsDBNull(r("Username")) AndAlso Not String.IsNullOrEmpty(r("Username")) Then obj.Username = r("Username")
         If Not IsDBNull(r("Password")) AndAlso Not String.IsNullOrEmpty(r("Password")) Then obj.Password = r("Password")
@@ -323,7 +323,7 @@ Friend Class SQL
 		Dim entLst As New Objects.EntryCollection
 
 		Using conn As New SqlConnection(ConnStr)
-			Using command As New SqlCommand(String.Format("SELECT * FROM dbo.Entries WHERE EntryID = '{0}'", EntryID), conn)
+			Using command As New SqlCommand(String.Format("SELECT * FROM Entries WHERE EntryID = '{0}'", EntryID), conn)
 				command.CommandType = System.Data.CommandType.Text
 				conn.Open()
 				Using reader = command.ExecuteReader()
@@ -366,11 +366,11 @@ Friend Class SQL
 			Dim isfirst As Boolean = True
 			For Each s As Long In Filter.Status
 				If isfirst Then isfirst = False Else FilterStr &= String.Format(" OR ")
-				FilterStr &= String.Format("Status = {0}", s)
+				FilterStr &= String.Format("[Status] = {0}", s)
 			Next
 			FilterStr &= String.Format(")")
 		End If
-		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= String.Format(" AND (Description LIKE '%{0}%')", Filter.Description)
+		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= String.Format(" AND ([Description] LIKE '%{0}%')", Filter.Description)
 		If Not String.IsNullOrEmpty(Filter.Notes) Then FilterStr &= String.Format(" AND (Notes = '%{0}%')", Filter.Notes)
 		If Filter.CategoryID > 0 Then FilterStr &= String.Format(" AND (CategoryID = {0})", Filter.CategoryID)
 		If Filter.LocationID > 0 Then FilterStr &= String.Format(" AND (LocationID = {0})", Filter.LocationID)
@@ -428,7 +428,7 @@ Friend Class SQL
 
 		If thisE.EntryID > 0 OrElse thisE.SaveID > 0 Then
 			If thisE.EntryID = 0 Then thisE.EntryID = thisE.SaveID
-			If Not String.IsNullOrEmpty(thisE.Description) Then QueryStr &= String.Format("Description = '{0}'", thisE.Description)
+			If Not String.IsNullOrEmpty(thisE.Description) Then QueryStr &= String.Format("[Description] = '{0}'", thisE.Description)
 			If thisE.Amount > 0.0 Then QueryStr &= String.Format(", Amount = {0}", thisE.Amount.ToString())
 			If thisE.EntryType <> Enumerations.EntryType.Unknown Then QueryStr &= String.Format(", EntryType = {0}", thisE.EntryType.ToString())
 			If Not String.IsNullOrEmpty(thisE.Notes) Then QueryStr &= String.Format(", Notes = '{0}'", thisE.Notes)
@@ -438,7 +438,7 @@ Friend Class SQL
 			If thisE.UserType <> Nothing AndAlso thisE.UserType <> Enumerations.UserType.Unknown Then QueryStr &= String.Format(", UserTYpe = {0}", thisE.UserType.ToString())
 			If thisE.CreatedDate <> CDate("1/1/2000") Then QueryStr &= String.Format(", CreatedDate = '{0}'", thisE.CreatedDate.ToString())
 			If thisE.Image IsNot Nothing AndAlso thisE.Image.Length > 0 Then QueryStr &= String.Format(", Image = {0}", System.Text.Encoding.UTF8.GetString(thisE.Image))
-			If thisE.Status <> Enumerations.EntryStatus.Unknown Then QueryStr &= String.Format(", Status = {0}", CType(thisE.Status, Integer).ToString())
+			If thisE.Status <> Enumerations.EntryStatus.Unknown Then QueryStr &= String.Format(", [Status] = {0}", CType(thisE.Status, Integer).ToString())
 			QueryStr &= " WHERE EntryID = " & thisE.EntryID
 			Using conn As New SqlConnection(ConnStr)
 				Dim sqltext As String = String.Format("UPDATE Entries SET {0}", QueryStr)
@@ -451,7 +451,7 @@ Friend Class SQL
 			End Using
 		Else
 			' Create a new Entry '
-			QueryStr &= "Amount, EntryType, UserID, UserType, Description, Notes, LocationID, CategoryID, Image, CreatedDate, Status"
+			QueryStr &= "Amount, EntryType, UserID, UserType, [Description], Notes, LocationID, CategoryID, Image, CreatedDate, [Status]"
 			Dim Query2 As String = ""
 			If thisE.Amount > 0.0 Then Query2 &= thisE.Amount & ", " Else Query2 &= "0"
 			If thisE.EntryType <> Nothing AndAlso thisE.EntryType <> Enumerations.EntryType.Unknown Then Query2 &= thisE.EntryType.ToString() & ", " Else Query2 &= "NULL, "
@@ -490,14 +490,14 @@ Friend Class SQL
 	Private Sub HydrateEntry(ByRef obj As Entry, ByVal r As System.Data.SqlClient.SqlDataReader)
 
 		If Not IsDBNull(r("EntryID")) Then obj.SetID(r("EntryID"))
-		If Not IsDBNull(r("Status")) Then obj.Status = r("Status")
+		If Not IsDBNull(r("Status")) Then obj.Status = r("[Status]")
 		If Not IsDBNull(r("EntryType")) Then obj.EntryType = r("EntryType")
 		If Not IsDBNull(r("Image")) AndAlso r("Image").Length > 0 Then obj.Image = r("Image")
 		If Not IsDBNull(r("CreatedDate")) AndAlso Not String.IsNullOrEmpty(r("CreatedDate")) Then obj.SetCreatedDate(CDate(r("CreatedDate")))
 		If Not IsDBNull(r("Amount")) Then obj.Amount = r("Amount")
 		If Not IsDBNull(r("UserID")) Then obj.UserID = r("UserID")
 		If Not IsDBNull(r("UserType")) Then obj.UserID = r("UserType")
-		If Not IsDBNull(r("Description")) Then obj.Description = r("Description")
+		If Not IsDBNull(r("Description")) Then obj.Description = r("[Description]")
 		If Not IsDBNull(r("Notes")) Then obj.Notes = r("Notes")
 		If Not IsDBNull(r("LocationID")) Then obj.LocationID = r("LocationID")
 		If Not IsDBNull(r("CategoryID")) Then obj.CategoryID = r("CategoryID")
@@ -556,13 +556,13 @@ Friend Class SQL
 			Dim isfirst As Boolean = True
 			For Each s As Long In Filter.Status
 				If isfirst Then isfirst = False Else FilterStr &= String.Format(" OR ")
-				FilterStr &= String.Format("Status = {0}", s)
+				FilterStr &= String.Format("[Status] = {0}", s)
 			Next
 			FilterStr &= String.Format(")")
 		End If
 		If Filter.LocationType <> Enumerations.LocationType.Unknown Then FilterStr &= String.Format(" AND (LocationType = {0}", Filter.LocationType)
 		If Not String.IsNullOrEmpty(Filter.Name) Then FilterStr &= String.Format(" AND (Name LIKE '%{0}%')", Filter.Name)
-		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= String.Format(" AND (Description LIKE '%{0}%')", Filter.Description)
+		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= String.Format(" AND ([Description] LIKE '%{0}%')", Filter.Description)
 		If Not String.IsNullOrEmpty(Filter.Url) Then FilterStr &= String.Format(" AND (URL LIKE '%{0}%')", Filter.Url)
 		If Filter.HasImage Then FilterStr &= " AND (Image IS NOT NULL)"
 		If Filter.RangeLength > 0 Then FilterStr &= String.Format(" AND (RowNum <= {0} AND RowNum > {1})", Filter.RangeLength + Filter.RangeBegin, Filter.RangeBegin)
@@ -607,20 +607,49 @@ Friend Class SQL
 	End Function
 
     Friend Function SaveObject_Location(ByVal thisL As Location) As Long
-		Dim QueryStr As String = ""
+		Dim QueryStr As String = "UPDATE Locations SET "
+		Dim Query2 As String = ""
 
 		If thisL.LocationID > 0 OrElse thisL.SaveID > 0 Then
 			If thisL.LocationID = 0 Then thisL.LocationID = thisL.SaveID
-			If Not String.IsNullOrEmpty(thisL.Description) Then QueryStr &= String.Format("Description = '{0}'", thisL.Description)
-			If thisL.LocationType <> Enumerations.LocationType.Unknown Then QueryStr &= String.Format(", LocationType = {0}", thisL.LocationType.ToString())
-			If Not String.IsNullOrEmpty(thisL.URL) Then QueryStr &= String.Format(", URL = '{0}'", thisL.URL)
-			If Not String.IsNullOrEmpty(thisL.Name) Then QueryStr &= String.Format(", Name = {0}", thisL.Name)
-			If thisL.Image IsNot Nothing AndAlso thisL.Image.Length > 0 Then QueryStr &= String.Format(", Image = {0}", System.Text.Encoding.UTF8.GetString(thisL.Image))
-			If thisL.Status <> Enumerations.LocationStatus.Unknown Then QueryStr &= String.Format(", Status = {0}", CType(thisL.Status, Integer).ToString())
+
+			If Not String.IsNullOrEmpty(thisL.Description) Then QueryStr &= "[Description] = @Description"
+			If thisL.LocationType <> Enumerations.LocationType.Unknown Then QueryStr &= ", LocationType = @LocationType"
+			If Not String.IsNullOrEmpty(thisL.URL) Then QueryStr &= ", URL = @URL"
+			If Not String.IsNullOrEmpty(thisL.Name) Then QueryStr &= ", Name = @Name"
+			If thisL.Image IsNot Nothing AndAlso thisL.Image.Length > 0 Then QueryStr &= ", Image = @Image"
+			If thisL.Status <> Enumerations.LocationStatus.Unknown Then QueryStr &= ", [Status] = @Status"
+
 			QueryStr &= " WHERE LocationID = " & thisL.LocationID
+
 			Using conn As New SqlConnection(ConnStr)
-				Dim sqltext As String = String.Format("UPDATE Locations SET {0}", QueryStr)
-				Using command As New SqlCommand(sqltext, conn)
+				Using command As New SqlCommand(QueryStr, conn)
+
+					If Not String.IsNullOrEmpty(thisL.Description) Then
+						command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 2000))
+						command.Parameters("@Description").Value = thisL.Description
+					End If
+					If thisL.LocationType <> Enumerations.LocationType.Unknown Then
+						command.Parameters.Add(New SqlParameter("@LocationType", SqlDbType.Int))
+						command.Parameters("@LocationType").Value = thisL.LocationType
+					End If
+					If Not String.IsNullOrEmpty(thisL.URL) Then
+						command.Parameters.Add(New SqlParameter("@URL", SqlDbType.VarChar, 200))
+						command.Parameters("@URL").Value = thisL.URL
+					End If
+					If Not String.IsNullOrEmpty(thisL.Name) Then
+						command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
+						command.Parameters("@Name").Value = thisL.Name
+					End If
+					If thisL.Image IsNot Nothing AndAlso thisL.Image.Length > 0 Then
+						command.Parameters.Add(New SqlParameter("@Image", SqlDbType.Image))
+						command.Parameters("@Image").Value = thisL.Image
+					End If
+					If thisL.Status <> Enumerations.LocationStatus.Unknown Then
+						command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
+						command.Parameters("@Status").Value = thisL.Status
+					End If
+
 					command.CommandType = System.Data.CommandType.Text
 					conn.Open()
 					command.ExecuteNonQuery()
@@ -629,17 +658,26 @@ Friend Class SQL
 			End Using
 		Else
 			' Create a new Location '
-			QueryStr &= "LocationType, Name, Description, URL, Image, Status"
-			Dim Query2 As String = ""
-			If thisL.LocationType <> Nothing AndAlso thisL.LocationType <> Enumerations.LocationType.Unknown Then Query2 &= thisL.LocationType.ToString() & ", " Else Query2 &= "NULL, "
-			If Not String.IsNullOrEmpty(thisL.Name) Then Query2 &= "'" & thisL.Name & "', " Else Query2 &= "NULL, "
-			If Not String.IsNullOrEmpty(thisL.Description) Then Query2 &= "'" & thisL.Description & "', " Else Query2 &= "NULL, "
-			If Not String.IsNullOrEmpty(thisL.URL) Then Query2 &= "'" & thisL.URL & "', " Else Query2 &= "NULL, "
-			If thisL.Image IsNot Nothing AndAlso thisL.Image.Length > 0 Then Query2 &= System.Text.Encoding.UTF8.GetString(thisL.Image) & ", " Else Query2 &= "NULL, "
-			If thisL.Status <> Nothing AndAlso thisL.Status <> Enumerations.LocationStatus.Unknown Then Query2 &= CType(thisL.Status, Integer).ToString() Else Query2 &= "NULL"
+			QueryStr = "LocationType, Name, [Description], URL, Image, [Status]"
+			Query2 = "@LocationType, @Name, @Description, @URL, @Image, @Status"
 
 			Using conn As New SqlConnection(ConnStr)
-				Using command As New SqlCommand(String.Format("INSERT INTO Locations ({0}) VALUES ({1});", QueryStr, Query2), conn)
+				Dim sqltext As String = String.Format("INSERT INTO Locations ({0}) VALUES ({1});", QueryStr, Query2)
+				Using command As New SqlCommand(sqltext, conn)
+
+					command.Parameters.Add(New SqlParameter("@LocationType", SqlDbType.Int))
+					command.Parameters("@LocationType").Value = IIf(thisL.LocationType <> Nothing AndAlso thisL.LocationType <> Enumerations.LocationType.Unknown, CType(thisL.LocationType, Integer), CType(Enumerations.LocationType.Unknown, Integer))
+					command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
+					command.Parameters("@Name").Value = IIf(String.IsNullOrEmpty(thisL.Name), Nothing, thisL.Name)
+					command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 2000))
+					command.Parameters("@Description").Value = IIf(String.IsNullOrEmpty(thisL.Description), Nothing, thisL.Description)
+					command.Parameters.Add(New SqlParameter("@URL", SqlDbType.VarChar, 200))
+					command.Parameters("@URL").Value = IIf(String.IsNullOrEmpty(thisL.URL), Nothing, thisL.URL)
+					command.Parameters.Add(New SqlParameter("@Image", SqlDbType.Image))
+					command.Parameters("@Image").Value = IIf(thisL.Image IsNot Nothing AndAlso thisL.Image.Length > 0, thisL.Image, New Byte() {})
+					command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
+					command.Parameters("@Status").Value = IIf(thisL.Status <> Nothing AndAlso thisL.Status <> Enumerations.LocationStatus.Unknown, thisL.Status, CType(Enumerations.LocationStatus.Unknown, Integer))
+
 					command.CommandType = System.Data.CommandType.Text
 					conn.Open()
 					Dim RowsAffected As Integer = 0
@@ -722,12 +760,12 @@ Friend Class SQL
 			Dim isfirst As Boolean = True
 			For Each s As Long In Filter.Status
 				If isfirst Then isfirst = False Else FilterStr &= String.Format(" OR ")
-				FilterStr &= String.Format("Status = {0}", s)
+				FilterStr &= String.Format("[Status] = {0}", s)
 			Next
 			FilterStr &= String.Format(")")
 		End If
 		If Not String.IsNullOrEmpty(Filter.Name) Then FilterStr &= String.Format(" AND (Name LIKE '%{0}%')", Filter.Name)
-		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= String.Format(" AND (Description LIKE '%{0}%')", Filter.Description)
+		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= String.Format(" AND ([Description] LIKE '%{0}%')", Filter.Description)
 		If Filter.RangeLength > 0 Then FilterStr &= String.Format(" AND (RowNum <= {0} AND RowNum > {1})", Filter.RangeLength + Filter.RangeBegin, Filter.RangeBegin)
 		If Not String.IsNullOrEmpty(Filter.Sort) Then FilterStr &= String.Format(" ORDER BY {0}", Filter.Sort)
 
@@ -770,17 +808,31 @@ Friend Class SQL
 	End Function
 
 	Friend Function SaveObject_Category(ByVal thisC As Category) As Long
-		Dim QueryStr As String = ""
+		Dim QueryStr As String = "UPDATE Categories SET "
+		Dim Query2 As String = ""
 
 		If thisC.CategoryID > 0 OrElse thisC.SaveID > 0 Then
 			If thisC.CategoryID = 0 Then thisC.CategoryID = thisC.SaveID
-			If Not String.IsNullOrEmpty(thisC.Description) Then QueryStr &= String.Format("Description = '{0}'", thisC.Description)
-			If Not String.IsNullOrEmpty(thisC.Name) Then QueryStr &= String.Format(", Name = {0}", thisC.Name)
-			If thisC.Status <> Enumerations.CategoryStatus.Unknown Then QueryStr &= String.Format(", Status = {0}", CType(thisC.Status, Integer).ToString())
+			If Not String.IsNullOrEmpty(thisC.Description) Then QueryStr &= "[Description] = @Description"
+			If Not String.IsNullOrEmpty(thisC.Name) Then QueryStr &= ", [Name] = @Name"
+			If thisC.Status <> Enumerations.CategoryStatus.Unknown Then QueryStr &= ", [Status] = @Status"
 			QueryStr &= " WHERE CategoryID = " & thisC.CategoryID
+
 			Using conn As New SqlConnection(ConnStr)
-				Dim sqltext As String = String.Format("UPDATE Categories SET {0}", QueryStr)
-				Using command As New SqlCommand(sqltext, conn)
+				Using command As New SqlCommand(QueryStr, conn)
+					If Not String.IsNullOrEmpty(thisC.Description) Then
+						command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 2000))
+						command.Parameters("@Description").Value = thisC.Description
+					End If
+					If Not String.IsNullOrEmpty(thisC.Name) Then
+						command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
+						command.Parameters("@Name").Value = thisC.Name
+					End If
+					If thisC.Status <> Enumerations.CategoryStatus.Unknown Then
+						command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
+						command.Parameters("@Status").Value = thisC.Status
+					End If
+
 					command.CommandType = System.Data.CommandType.Text
 					conn.Open()
 					command.ExecuteNonQuery()
@@ -789,14 +841,34 @@ Friend Class SQL
 			End Using
 		Else
 			' Create a new Category '
-			QueryStr &= "Name, Description, Status"
-			Dim Query2 As String = ""
-			If Not String.IsNullOrEmpty(thisC.Name) Then Query2 &= "'" & thisC.Name & "', " Else Query2 &= "NULL, "
-			If Not String.IsNullOrEmpty(thisC.Description) Then Query2 &= "'" & thisC.Description & "', " Else Query2 &= "NULL, "
-			If thisC.Status <> Nothing AndAlso thisC.Status <> Enumerations.CategoryStatus.Unknown Then Query2 &= CType(thisC.Status, Integer).ToString() Else Query2 &= "NULL"
+			QueryStr = "Name, [Description], [Status]"
+			Query2 = "@Name, @Description, @Status"
 
 			Using conn As New SqlConnection(ConnStr)
 				Using command As New SqlCommand(String.Format("INSERT INTO Categories ({0}) VALUES ({1});", QueryStr, Query2), conn)
+
+					If Not String.IsNullOrEmpty(thisC.Name) Then
+						command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
+						command.Parameters("@Name").Value = thisC.Name
+					Else
+						command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
+						command.Parameters("@Name").Value = ""
+					End If
+					If Not String.IsNullOrEmpty(thisC.Description) Then
+						command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 2000))
+						command.Parameters("@Description").Value = thisC.Description
+					Else
+						command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 2000))
+						command.Parameters("@Description").Value = ""
+					End If
+					If thisC.Status <> Nothing AndAlso thisC.Status <> Enumerations.CategoryStatus.Unknown Then
+						command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
+						command.Parameters("@Status").Value = thisC.Status
+					Else
+						command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
+						command.Parameters("@Status").Value = -1
+					End If
+
 					command.CommandType = System.Data.CommandType.Text
 					conn.Open()
 					Dim RowsAffected As Integer = 0

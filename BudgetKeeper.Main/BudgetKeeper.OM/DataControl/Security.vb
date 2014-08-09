@@ -319,7 +319,7 @@
         If e Is Nothing Then
             Throw New Exception(String.Format("Entry with ID {0} not found in system.", InEntry.ID))
         End If
-
+		InEntry = e
     End Sub
 
     Private Sub GetLocation(ByRef InLocation As Objects.Location)
@@ -327,7 +327,7 @@
         If l Is Nothing Then
             Throw New Exception(String.Format("Location with ID {0} not found in system.", InLocation.ID))
         End If
-
+		InLocation = l
     End Sub
 
     Private Sub GetCategory(ByRef InCategory As Objects.Category)
@@ -335,7 +335,7 @@
         If c Is Nothing Then
             Throw New Exception(String.Format("User with ID {0} not found in system.", InCategory.ID))
         End If
-
+		InCategory = c
     End Sub
 
 #End Region

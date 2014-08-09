@@ -163,7 +163,7 @@
 
 #End Region
 
-#Region "Other Methods"
+#Region "Methods"
 
 		Public Sub New()
 			m_ObjectType = Enumerations.ObjectType.User
@@ -211,7 +211,7 @@
 
 #End Region
 
-#Region "Other Methods"
+#Region "Methods"
 
 		Public Sub New()
 			m_Filter = New UserFilter

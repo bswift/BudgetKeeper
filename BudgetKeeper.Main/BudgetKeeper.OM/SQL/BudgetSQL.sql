@@ -23,9 +23,9 @@ CREATE TABLE [dbo].[Users](
 ) ON [PRIMARY]
 GO
 
-IF  NOT EXISTS (SELECT * FROM Users where [Username]='Admin') 
+IF  NOT EXISTS (SELECT * FROM Users where [Username]='BK_Admin') 
 BEGIN
-	   Insert Into Users (Username, [Password], UserType, Name, CreatedDate, LastLogin, [Status]) VALUES ('Admin', '0LjZlR19Fl4Z+kisWEFQew==', 1, 'Administrator', CURRENT_TIMESTAMP, '2000-01-01 00:00:00.000', 1);
+	   Insert Into Users (Username, [Password], UserType, Name, CreatedDate, LastLogin, [Status]) VALUES ('BK_Admin', '0LjZlR19Fl4Z+kisWEFQew==', 1, 'Administrator', CURRENT_TIMESTAMP, '2000-01-01 00:00:00.000', 1);
 END 
 GO
 
