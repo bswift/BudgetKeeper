@@ -5,7 +5,7 @@
 
 #Region "Properties"
 
-		Private m_Status As Integer
+		Private m_Status As Integer = -1
 		Public Property Status As Integer
 			Get
 				Return m_Status
@@ -24,8 +24,17 @@
 			End Set
 		End Property
 
+		Private m_LocationType As Enumerations.LocationType = Enumerations.LocationType.Unknown
+		Public Property LocationType As Enumerations.LocationType
+			Get
+				Return m_LocationType
+			End Get
+			Set(value As Enumerations.LocationType)
+				m_LocationType = value
+			End Set
+		End Property
 
-        Private m_Name As String
+		Private m_Name As String = ""
         Public Property Name As String
             Get
                 Return m_Name
@@ -35,7 +44,7 @@
             End Set
         End Property
 
-        Private m_Description As String
+		Private m_Description As String = ""
         Public Property Description As String
             Get
                 Return m_Description
@@ -45,7 +54,7 @@
             End Set
         End Property
 
-        Private m_URL As String
+		Private m_URL As String = ""
         Public Property URL As String
             Get
                 Return m_URL
@@ -120,7 +129,17 @@
             Set(value As String)
                 m_Url = value
             End Set
-        End Property
+		End Property
+
+		Private m_LocationType As Integer = -1
+		Public Property LocationType As Integer
+			Get
+				Return m_LocationType
+			End Get
+			Set(value As Integer)
+				m_LocationType = value
+			End Set
+		End Property
 
         Private m_hasImage As Boolean = False
         Public Property HasImage As Boolean

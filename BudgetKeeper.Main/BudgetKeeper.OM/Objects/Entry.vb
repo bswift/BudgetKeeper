@@ -195,17 +195,27 @@
             End Set
         End Property
 
-        Private m_Amount As Double
-        Public Property Amount As Double
-            Get
-                Return m_Amount
-            End Get
-            Set(value As Double)
-                m_Amount = value
-            End Set
-        End Property
+		Private m_AmountFrom As Double = -1.0
+		Public Property AmountFrom As Double
+			Get
+				Return m_AmountFrom
+			End Get
+			Set(value As Double)
+				m_AmountFrom = value
+			End Set
+		End Property
 
-        Private m_Description As String
+		Private m_AmountTo As Double = -1.0
+		Public Property AmountTo As Double
+			Get
+				Return m_AmountTo
+			End Get
+			Set(value As Double)
+				m_AmountTo = value
+			End Set
+		End Property
+
+		Private m_Description As String = ""
         Public Property Description As String
             Get
                 Return m_Description
@@ -215,7 +225,7 @@
             End Set
         End Property
 
-        Private m_Notes As String
+		Private m_Notes As String = ""
         Public Property Notes As String
             Get
                 Return m_Notes
@@ -225,7 +235,7 @@
             End Set
         End Property
 
-        Private m_LocationID As Long
+		Private m_LocationID As Long = 0
         Public Property LocationID As Long
             Get
                 Return m_LocationID
@@ -235,7 +245,7 @@
             End Set
         End Property
 
-        Private m_CategoryID As Long
+		Private m_CategoryID As Long = 0
         Public Property CategoryID As Long
             Get
                 Return m_CategoryID
@@ -245,22 +255,35 @@
             End Set
         End Property
 
-        Private m_CreatedDate As DateTime
-        Public ReadOnly Property CreatedDate As DateTime
-            Get
-                Return m_CreatedDate
-            End Get
-        End Property
+		Private m_CreatedDateFrom As DateTime = CDate("01/01/2000")
+		Public Property CreatedDateFrom As DateTime
+			Get
+				Return m_CreatedDateFrom
+			End Get
+			Set(value As DateTime)
+				m_CreatedDateFrom = value
+			End Set
+		End Property
 
-        Private m_Image As Byte() = Nothing
-        Public Property Image As Byte()
-            Get
-                Return m_Image
-            End Get
-            Set(ByVal value As Byte())
-                m_Image = value
-            End Set
-        End Property
+		Private m_CreatedDateTo As DateTime = CDate("01/01/2000")
+		Public Property CreatedDateTo As DateTime
+			Get
+				Return m_CreatedDateTo
+			End Get
+			Set(value As DateTime)
+				m_CreatedDateTo = value
+			End Set
+		End Property
+
+		Private m_HasImage As Boolean = False
+		Public Property HasImage As Boolean
+			Get
+				Return m_HasImage
+			End Get
+			Set(ByVal value As Boolean)
+				m_HasImage = value
+			End Set
+		End Property
 
 	End Class
 

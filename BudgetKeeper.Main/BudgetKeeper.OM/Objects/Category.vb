@@ -5,12 +5,12 @@
 
 #Region "Properties"
 
-		Private m_Status As Integer
-		Public Property Status As Integer
+		Private m_Status As Enumerations.CategoryStatus = Enumerations.CategoryStatus.Unknown
+		Public Property Status As Enumerations.CategoryStatus
 			Get
 				Return m_Status
 			End Get
-			Set(value As Integer)
+			Set(value As Enumerations.CategoryStatus)
 				m_Status = value
 			End Set
 		End Property
@@ -24,17 +24,17 @@
 			End Set
 		End Property
 
-        Private m_Name As String
-        Public Property Name As String
-            Get
-                Return m_Name
-            End Get
-            Set(value As String)
-                m_Name = value
-            End Set
-        End Property
+		Private m_Name As String = ""
+		Public Property Name As String
+			Get
+				Return m_Name
+			End Get
+			Set(value As String)
+				m_Name = value
+			End Set
+		End Property
 
-        Private m_Description As String
+		Private m_Description As String = ""
         Public Property Description As String
             Get
                 Return m_Description

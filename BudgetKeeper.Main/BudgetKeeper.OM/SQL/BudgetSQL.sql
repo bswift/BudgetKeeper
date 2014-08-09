@@ -67,6 +67,7 @@ GO
 IF NOT EXISTS(SELECT * FROM sys.objects WHERE OBJECT_ID = OBJECT_ID(N'[dbo].[Locations]') AND TYPE in (N'U'))
 CREATE TABLE [dbo].[Locations](
 	[LocationID] [int] IDENTITY(1,1) NOT NULL,
+	[LocationType] [int] NULL,
 	[Name] [varchar] (100) NULL,
 	[Description] [varchar](2000) NULL,
 	[URL] [varchar] (200) NULL,

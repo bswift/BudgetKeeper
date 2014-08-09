@@ -167,7 +167,6 @@
 
 		Public Sub New()
 			m_ObjectType = Enumerations.ObjectType.User
-			m_ChangeFlag = Enumerations.ChangeFlag.NoChange
 		End Sub
 
 		Public Overrides Sub Clean()

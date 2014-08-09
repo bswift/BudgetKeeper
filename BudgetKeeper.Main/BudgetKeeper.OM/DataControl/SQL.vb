@@ -169,7 +169,6 @@ Friend Class SQL
         ' Fill up collection
         Dim uColl As New Objects.UserCollection()
         Dim obj As New User()
-        Dim tmpLst As IQueryable(Of Objects.User) = Nothing
 
         Dim FilterStr As String = ""
         If Filter.ID > 0 Then
@@ -204,17 +203,18 @@ Friend Class SQL
         If Not String.IsNullOrEmpty(Filter.Sort) Then FilterStr &= String.Format(" ORDER BY {0}", Filter.Sort)
 
         If Filter.CountOnly Then
-            Using conn As New SqlConnection(ConnStr)
-                Using command As New SqlCommand(String.Format("SELECT COUNT(UserID) AS 'Count' FROM Users {0}", FilterStr), conn)
-                    command.CommandType = System.Data.CommandType.Text
-                    conn.Open()
-                    Using reader = command.ExecuteReader()
-                        While reader.Read
-                            If Not IsDBNull(reader("Count")) Then ThisCount = reader("Count")
-                        End While
-                    End Using
-                End Using
-            End Using
+			Using conn As New SqlConnection(ConnStr)
+				Dim sqltext As String = String.Format("SELECT COUNT(UserID) AS 'Count' FROM Users WHERE 1 = 1{0}", FilterStr)
+				Using command As New SqlCommand(sqltext, conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					Using reader = command.ExecuteReader()
+						While reader.Read
+							If Not IsDBNull(reader("Count")) Then ThisCount = reader("Count")
+						End While
+					End Using
+				End Using
+			End Using
             Return Nothing
         Else
             Using conn As New SqlConnection(ConnStr)
@@ -248,7 +248,8 @@ Friend Class SQL
             If Not String.IsNullOrEmpty(thisU.Email) Then QueryStr &= ", Email = '" & thisU.Email & "'"
             If Not String.IsNullOrEmpty(thisU.Phone) Then QueryStr &= ", Phone = '" & thisU.Phone & "'"
             If thisU.CreatedDate <> CDate("1/1/2000") Then QueryStr &= ", CreatedDate = '" & thisU.CreatedDate.ToString() & "'"
-            If thisU.LastLogin <> CDate("1/1/2000") Then QueryStr &= ", LastLogin = '" & thisU.LastLogin.ToString() & "'"
+			If thisU.LastLogin <> CDate("1/1/2000") Then QueryStr &= ", LastLogin = '" & thisU.LastLogin.ToString() & "'"
+			If thisU.Image IsNot Nothing AndAlso thisU.Image.Length > 0 Then QueryStr &= ", Image = " & System.Text.Encoding.UTF8.GetString(thisU.Image)
             If thisU.Status <> Enumerations.UserStatus.Unknown Then QueryStr &= ", Status = " & CType(thisU.Status, Integer).ToString()
             QueryStr &= " WHERE UserID = " & thisU.UserID
             Using conn As New SqlConnection(ConnStr)
@@ -262,72 +263,39 @@ Friend Class SQL
             End Using
         Else
             ' Create a new user '
-            QueryStr &= "Username, Password, UserType, Name, Email, Phone, CreatedDate, LastLogin, Status"
+			QueryStr &= "Username, Password, UserType, Name, Email, Phone, CreatedDate, LastLogin, Image, Status"
             Dim Query2 As String = ""
-            If Not String.IsNullOrEmpty(thisU.Username) Then
-                Query2 &= "'" & thisU.Username & "', "
-            End If
-            If Not String.IsNullOrEmpty(thisU.Password) Then
-                Query2 &= "'" & thisU.Password & "', "
-            Else
-                Query2 &= "NULL, "
-            End If
-            If thisU.UserType <> Nothing AndAlso thisU.UserType <> Enumerations.UserType.Unknown Then
-                Query2 &= thisU.UserType.ToString() & ", "
-            Else
-                Query2 &= "NULL, "
-            End If
-            If Not String.IsNullOrEmpty(thisU.FullName) Then
-                Query2 &= "'" & thisU.FullName & "', "
-            Else
-                Query2 &= "NULL, "
-            End If
-            If Not String.IsNullOrEmpty(thisU.Email) Then
-                Query2 &= "'" & thisU.Email & "', "
-            Else
-                Query2 &= "NULL, "
-            End If
-            If Not String.IsNullOrEmpty(thisU.Phone) Then
-                Query2 &= "'" & thisU.Phone & "', "
-            Else
-                Query2 &= "NULL, "
-            End If
-            If thisU.CreatedDate <> Nothing AndAlso thisU.CreatedDate <> CDate("01/01/2000") Then
-                Query2 &= "'" & thisU.CreatedDate.ToString() & "', "
-            Else
-                Query2 &= "NULL, "
-            End If
-            If thisU.LastLogin <> Nothing AndAlso thisU.LastLogin <> CDate("01/01/2000") Then
-                Query2 &= "'" & thisU.LastLogin.ToString() & "', "
-            Else
-                Query2 &= "NULL, "
-            End If
-            If thisU.Status <> Nothing AndAlso thisU.Status <> Enumerations.UserStatus.Unknown Then
-                Query2 &= CType(thisU.Status, Integer).ToString()
-            Else
-                Query2 &= "NULL"
-            End If
+            If Not String.IsNullOrEmpty(thisU.Username) Then  Query2 &= "'" & thisU.Username & "', "
+			If Not String.IsNullOrEmpty(thisU.Password) Then Query2 &= "'" & thisU.Password & "', " Else Query2 &= "NULL, "
+			If thisU.UserType <> Nothing AndAlso thisU.UserType <> Enumerations.UserType.Unknown Then Query2 &= thisU.UserType.ToString() & ", " Else Query2 &= "NULL, "
+			If Not String.IsNullOrEmpty(thisU.FullName) Then Query2 &= "'" & thisU.FullName & "', " Else Query2 &= "NULL, "
+			If Not String.IsNullOrEmpty(thisU.Email) Then Query2 &= "'" & thisU.Email & "', " Else Query2 &= "NULL, "
+			If Not String.IsNullOrEmpty(thisU.Phone) Then Query2 &= "'" & thisU.Phone & "', " Else Query2 &= "NULL, "
+			If thisU.CreatedDate <> Nothing AndAlso thisU.CreatedDate <> CDate("01/01/2000") Then Query2 &= "'" & thisU.CreatedDate.ToString() & "', " Else Query2 &= "NULL, "
+			If thisU.LastLogin <> Nothing AndAlso thisU.LastLogin <> CDate("01/01/2000") Then Query2 &= "'" & thisU.LastLogin.ToString() & "', " Else Query2 &= "NULL, "
+			If thisU.Image IsNot Nothing AndAlso thisU.Image.Length > 0 Then Query2 &= System.Text.Encoding.UTF8.GetString(thisU.Image) & ", " Else Query2 &= "NULL, "
+			If thisU.Status <> Nothing AndAlso thisU.Status <> Enumerations.UserStatus.Unknown Then Query2 &= CType(thisU.Status, Integer).ToString() Else Query2 &= "NULL"
 
-            Using conn As New SqlConnection(ConnStr)
-                Using command As New SqlCommand(String.Format("INSERT INTO Users ({0}) VALUES ({1});", QueryStr, Query2), conn)
-                    command.CommandType = System.Data.CommandType.Text
-                    conn.Open()
-                    Dim RowsAffected As Integer = 0
-                    RowsAffected = command.ExecuteNonQuery()
-                    If RowsAffected > 0 Then
-                        command.CommandText = "SELECT TOP 1 UserID FROM Users ORDER BY UserID DESC"
-                        Using reader = command.ExecuteReader()
-                            While reader.Read
-                                If Not IsDBNull(reader("UserID")) Then thisU.SetID(reader("UserID"))
-                            End While
-                        End Using
-                    End If
-                    conn.Close()
-                End Using
-            End Using
-        End If
+			Using conn As New SqlConnection(ConnStr)
+				Using command As New SqlCommand(String.Format("INSERT INTO Users ({0}) VALUES ({1});", QueryStr, Query2), conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					Dim RowsAffected As Integer = 0
+					RowsAffected = command.ExecuteNonQuery()
+					If RowsAffected > 0 Then
+						command.CommandText = "SELECT TOP 1 UserID FROM Users ORDER BY UserID DESC"
+						Using reader = command.ExecuteReader()
+							While reader.Read
+								If Not IsDBNull(reader("UserID")) Then thisU.SetID(reader("UserID"))
+							End While
+						End Using
+					End If
+					conn.Close()
+				End Using
+			End Using
+		End If
 
-        Return thisU.UserID
+		Return thisU.UserID
     End Function
 
     Private Sub HydrateUser(ByRef obj As User, ByVal r As System.Data.SqlClient.SqlDataReader)
@@ -340,7 +308,7 @@ Friend Class SQL
         If Not IsDBNull(r("Name")) AndAlso Not String.IsNullOrEmpty(r("Name")) Then obj.FullName = r("Name")
         If Not IsDBNull(r("Email")) AndAlso Not String.IsNullOrEmpty(r("Email")) Then obj.Email = r("Email")
         If Not IsDBNull(r("Phone")) AndAlso Not String.IsNullOrEmpty(r("Phone")) Then obj.Username = r("Phone")
-        'If Not IsDBNull(r("Image")) AndAlso r("Image").Length > 0 Then obj.Image = r("Image")
+		If Not IsDBNull(r("Image")) AndAlso r("Image").Length > 0 Then obj.Image = r("Image")
         If Not IsDBNull(r("CreatedDate")) AndAlso Not String.IsNullOrEmpty(r("CreatedDate")) Then obj.SetCreatedDate(CDate(r("CreatedDate")))
         If Not IsDBNull(r("LastLogin")) AndAlso Not String.IsNullOrEmpty(r("LastLogin")) Then obj.SetLastLogin(CDate(r("LastLogin")))
 
@@ -351,115 +319,293 @@ Friend Class SQL
 #Region "Entry"
 
     Public Function GetObject_Entry(ByVal EntryID As Long) As Entry
-        Dim ent As Objects.Entry = Nothing
-        Dim entLst As New Objects.EntryCollection
+		Dim ent As Objects.Entry = Nothing
+		Dim entLst As New Objects.EntryCollection
 
-        Using conn As New SqlConnection(ConnStr)
-            Using command As New SqlCommand(String.Format("SELECT * FROM dbo.Entries WHERE EntryID = '{0}'", EntryID), conn)
-                command.CommandType = System.Data.CommandType.Text
-                conn.Open()
-                Using reader = command.ExecuteReader()
-                    While reader.Read
-                        Dim newEntry = New Entry()
+		Using conn As New SqlConnection(ConnStr)
+			Using command As New SqlCommand(String.Format("SELECT * FROM dbo.Entries WHERE EntryID = '{0}'", EntryID), conn)
+				command.CommandType = System.Data.CommandType.Text
+				conn.Open()
+				Using reader = command.ExecuteReader()
+					While reader.Read
+						Dim newEntry = New Entry()
+						HydrateEntry(newEntry, reader)
+						entLst.Add(newEntry)
+					End While
+				End Using
+			End Using
+		End Using
 
-                        If Not IsDBNull(reader("EntryID")) Then newEntry.SetID(reader("EntryID"))
-                        If Not IsDBNull(reader("Amount")) Then newEntry.Amount = reader("Amount")
-                        If Not IsDBNull(reader("Status")) Then newEntry.Status = reader("Status")
-                        If Not IsDBNull(reader("EntryType")) Then newEntry.EntryType = reader("EntryType")
-                        If Not IsDBNull(reader("Description")) AndAlso Not String.IsNullOrEmpty(reader("Description")) Then newEntry.Description = reader("Description")
-                        If Not IsDBNull(reader("Notes")) AndAlso Not String.IsNullOrEmpty(reader("Notes")) Then newEntry.Notes = reader("Notes")
-                        If Not IsDBNull(reader("UserID")) Then newEntry.UserID = reader("UserID")
-                        If Not IsDBNull(reader("UserType")) Then newEntry.UserType = reader("UserType")
-                        If Not IsDBNull(reader("LocationID")) Then newEntry.LocationID = reader("LocationID")
-                        If Not IsDBNull(reader("CategoryID")) Then newEntry.CategoryID = reader("CategoryID")
-                        If Not IsDBNull(reader("Image")) Then newEntry.Image = reader("Image")
-                        If Not IsDBNull(reader("CreatedDate")) AndAlso Not String.IsNullOrEmpty(reader("CreatedDate")) Then newEntry.SetCreatedDate(CDate(reader("CreatedDate")))
+		If entLst.Count > 1 Then
+			Throw New Exception("Duplicate IDs found")
+		ElseIf entLst.Count = 1 Then
+			ent = entLst(0)
+		End If
 
-                        entLst.Add(newEntry)
-                    End While
-                End Using
-            End Using
-        End Using
-
-        If entLst.Count > 1 Then
-            Throw New Exception("Duplicate IDs found")
-        ElseIf entLst.Count = 1 Then
-            ent = entLst(0)
-        End If
-
-        Return ent
+		Return ent
     End Function
 
-    Public Function GetCollection_Entry(ByVal Filter As _BaseFilter, Optional ByRef ThisCount As Integer = 0) As Objects.EntryCollection
-        Dim eColl As New Objects.EntryCollection()
-        Dim tmpLst As IQueryable(Of Objects.Entry) = Nothing
-        Dim FilterStr As String = "WHERE (EntryID IS NOT NULL) "
+	Public Function GetCollection_Entry(ByVal Filter As EntryFilter, Optional ByRef ThisCount As Integer = 0) As Objects.EntryCollection
+		Dim eColl As New Objects.EntryCollection()
+		Dim obj As New Entry()
 
-        If Filter.CountOnly Then
-            Using conn As New SqlConnection(ConnStr)
-                Using command As New SqlCommand(String.Format("SELECT COUNT(EntryID) AS 'Count' FROM Entries {0}", FilterStr), conn)
-                    command.CommandType = System.Data.CommandType.Text
-                    conn.Open()
-                    Using reader = command.ExecuteReader()
-                        While reader.Read
-                            If Not IsDBNull(reader("Count")) Then ThisCount = reader("Count")
-                        End While
-                    End Using
-                End Using
-            End Using
-            Return Nothing
-        Else
-            Using conn As New SqlConnection(ConnStr)
-                Using command As New SqlCommand(String.Format("SELECT * FROM Entries {0}", FilterStr), conn)
-                    command.CommandType = System.Data.CommandType.Text
-                    conn.Open()
-                    Using reader = command.ExecuteReader()
-                        While reader.Read
-                            If Not IsDBNull(reader("Count")) Then ThisCount = reader("Count")
-                        End While
-                    End Using
-                End Using
-            End Using
-        End If
+		Dim FilterStr As String = ""
+		If Filter.ID > 0 Then
+			FilterStr &= String.Format(" AND (EntryID = {0})", Filter.ID)
+		ElseIf Filter.MultiIDs.Count > 0 Then
+			FilterStr &= String.Format(" AND (")
+			Dim isfirst As Boolean = True
+			For Each id As Long In Filter.MultiIDs
+				If isfirst Then isfirst = False Else FilterStr &= String.Format(" OR ")
+				FilterStr &= String.Format("EntryID = {0}", id)
+			Next
+			FilterStr &= String.Format(")")
+		End If
+		If Filter.Status.Count > 0 Then
+			FilterStr &= String.Format(" AND (")
+			Dim isfirst As Boolean = True
+			For Each s As Long In Filter.Status
+				If isfirst Then isfirst = False Else FilterStr &= String.Format(" OR ")
+				FilterStr &= String.Format("Status = {0}", s)
+			Next
+			FilterStr &= String.Format(")")
+		End If
+		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= String.Format(" AND (Description LIKE '%{0}%')", Filter.Description)
+		If Not String.IsNullOrEmpty(Filter.Notes) Then FilterStr &= String.Format(" AND (Notes = '%{0}%')", Filter.Notes)
+		If Filter.CategoryID > 0 Then FilterStr &= String.Format(" AND (CategoryID = {0})", Filter.CategoryID)
+		If Filter.LocationID > 0 Then FilterStr &= String.Format(" AND (LocationID = {0})", Filter.LocationID)
+		If Filter.AmountFrom > -1.0 Then FilterStr &= String.Format("AND (Amount >= {0}", Filter.AmountFrom)
+		If Filter.AmountTo > -1.0 Then FilterStr &= String.Format(" AND (Amount <= {0}", Filter.AmountTo)
+		If Filter.EntryType <> Enumerations.EntryType.Unknown Then FilterStr &= String.Format(" AND (EntryType = {0}", Filter.EntryType)
+		If Filter.UserID > 0 Then FilterStr &= String.Format(" AND (UserID = {0}", Filter.UserID)
+		If Filter.UserType <> Enumerations.UserType.Unknown Then FilterStr &= String.Format(" AND (UserType = {0}", Filter.UserType)
+		If Filter.HasImage Then FilterStr &= " AND (Image IS NOT NULL)"
+		If Filter.CreatedDateFrom > CDate("1/1/2000") Then FilterStr &= String.Format(" AND (CreatedDate >= '{0}')", Filter.CreatedDateFrom)
+		If Filter.CreatedDateTo > CDate("1/1/2000") Then FilterStr &= String.Format(" AND (CreatedDate <= '{0}')", Filter.CreatedDateTo)
+		If Filter.RangeLength > 0 Then FilterStr &= String.Format(" AND (RowNum <= {0} AND RowNum > {1})", Filter.RangeLength + Filter.RangeBegin, Filter.RangeBegin)
+		If Not String.IsNullOrEmpty(Filter.Sort) Then FilterStr &= String.Format(" ORDER BY {0}", Filter.Sort)
 
-        ' get a range, if specified
-        If Filter.RangeBegin > 0 Then tmpLst = tmpLst.Skip(Filter.RangeBegin)
-        If Filter.RangeLength > 0 Then tmpLst = tmpLst.Take(Filter.RangeLength)
 
-        ' Return result
-        Return eColl
-    End Function
+		If Filter.CountOnly Then
+			Using conn As New SqlConnection(ConnStr)
+				Dim sqltext As String = String.Format("SELECT COUNT(EntryID) AS 'Count' FROM Entries WHERE 1 = 1{0}", FilterStr)
+				Using command As New SqlCommand(sqltext, conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					Using reader = command.ExecuteReader()
+						While reader.Read
+							If Not IsDBNull(reader("Count")) Then ThisCount = reader("Count")
+						End While
+					End Using
+					conn.Close()
+				End Using
+			End Using
+			Return Nothing
+		Else
+			Using conn As New SqlConnection(ConnStr)
+				Dim sqltext As String = String.Format("SELECT rank() OVER (ORDER BY EntryID) as 'RowNum',* FROM Entries WHERE 1 = 1{0}", FilterStr)
+				Using command As New SqlCommand(sqltext, conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					Using reader = command.ExecuteReader()
+						While reader.Read
+							obj = New Objects.Entry
+							HydrateEntry(obj, reader)
+							eColl.Add(obj)
+						End While
+					End Using
+					conn.Close()
+				End Using
+			End Using
+		End If
+
+		' Return result
+		Return eColl
+	End Function
 
     Friend Function SaveObject_Entry(ByVal thisE As Entry) As Long
-        Dim QueryStr As String = ""
+		Dim QueryStr As String = ""
 
-        QueryStr &= "WHERE UserID = " & thisE.EntryID
+		If thisE.EntryID > 0 OrElse thisE.SaveID > 0 Then
+			If thisE.EntryID = 0 Then thisE.EntryID = thisE.SaveID
+			If Not String.IsNullOrEmpty(thisE.Description) Then QueryStr &= "Description = '" & thisE.Description & "'"
+			If Not String.IsNullOrEmpty(thisE.Amount) Then QueryStr &= ", Amount = '" & thisE.Amount & "'"
+			If Not String.IsNullOrEmpty(thisE.CategoryID) Then QueryStr &= ", CategoryID = '" & thisE.CategoryID & "'"
+			If thisE.EntryType <> Enumerations.EntryType.Unknown Then QueryStr &= ", EntryType = " & thisE.EntryType.ToString()
+			If Not String.IsNullOrEmpty(thisE.Notes) Then QueryStr &= ", Notes = '" & thisE.Notes & "'"
+			If Not String.IsNullOrEmpty(thisE.LocationID) Then QueryStr &= ", LocationID = " & thisE.LocationID
+			If Not String.IsNullOrEmpty(thisE.CategoryID) Then QueryStr &= ", CategoryID = " & thisE.CategoryID
+			If Not String.IsNullOrEmpty(thisE.UserID) Then QueryStr &= ", UserID = " & thisE.UserID
+			If Not String.IsNullOrEmpty(thisE.UserType) Then QueryStr &= ", UserTYpe = " & thisE.UserType
+			If thisE.CreatedDate <> CDate("1/1/2000") Then QueryStr &= ", CreatedDate = '" & thisE.CreatedDate.ToString() & "'"
+			If thisE.Image IsNot Nothing AndAlso thisE.Image.Length > 0 Then QueryStr &= ", Image = " & System.Text.Encoding.UTF8.GetString(thisE.Image)
+			If thisE.Status <> Enumerations.EntryStatus.Unknown Then QueryStr &= ", Status = " & CType(thisE.Status, Integer).ToString()
+			QueryStr &= " WHERE EntryID = " & thisE.EntryID
+			Using conn As New SqlConnection(ConnStr)
+				Dim sqltext As String = String.Format("UPDATE Entries SET {0}", QueryStr)
+				Using command As New SqlCommand(sqltext, conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					command.ExecuteNonQuery()
+					conn.Close()
+				End Using
+			End Using
+		Else
+			' Create a new Entry '
+			QueryStr &= "Amount, EntryType, UserID, UserType, Description, Notes, LocationID, CategoryID, Image, CreatedDate, Status"
+			Dim Query2 As String = ""
+			If thisE.Amount > 0 Then Query2 &= thisE.Amount & ", " Else Query2 &= "0"
+			If thisE.EntryType <> Nothing AndAlso thisE.EntryType <> Enumerations.EntryType.Unknown Then Query2 &= thisE.EntryType.ToString() & ", " Else Query2 &= "NULL, "
+			If thisE.UserID > 0 Then Query2 &= thisE.UserID & ", " Else Query2 &= "NULL, "
+			If thisE.UserType <> Nothing AndAlso thisE.UserType <> Enumerations.UserType.Unknown Then Query2 &= thisE.UserType.ToString() & ", " Else Query2 &= "NULL, "
+			If Not String.IsNullOrEmpty(thisE.Description) Then Query2 &= "'" & thisE.Description & "', " Else Query2 &= "NULL, "
+			If Not String.IsNullOrEmpty(thisE.Notes) Then Query2 &= "'" & thisE.Notes & "', " Else Query2 &= "NULL, "
+			If thisE.LocationID > 0 Then Query2 &= thisE.LocationID & ", " Else Query2 &= "NULL, "
+			If thisE.CategoryID > 0 Then Query2 &= thisE.CategoryID & ", " Else Query2 &= "NULL, "
+			If thisE.Image IsNot Nothing AndAlso thisE.Image.Length > 0 Then Query2 &= System.Text.Encoding.UTF8.GetString(thisE.Image) & ", " Else Query2 &= "NULL, "
+			If thisE.CreatedDate <> Nothing AndAlso thisE.CreatedDate <> CDate("01/01/2000") Then Query2 &= "'" & thisE.CreatedDate.ToString() & "', " Else Query2 &= "NULL, "
+			If thisE.Status <> Nothing AndAlso thisE.Status <> Enumerations.EntryStatus.Unknown Then Query2 &= CType(thisE.Status, Integer).ToString() Else Query2 &= "NULL"
 
-        Using conn As New SqlConnection(ConnStr)
-            Using command As New SqlCommand(String.Format("UPDATE Entries SET {0}", QueryStr), conn)
-                command.CommandType = System.Data.CommandType.Text
-                conn.Open()
-                Using reader = command.ExecuteReader()
-                    While reader.Read
+			Using conn As New SqlConnection(ConnStr)
+				Using command As New SqlCommand(String.Format("INSERT INTO Entries ({0}) VALUES ({1});", QueryStr, Query2), conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					Dim RowsAffected As Integer = 0
+					RowsAffected = command.ExecuteNonQuery()
+					If RowsAffected > 0 Then
+						command.CommandText = "SELECT TOP 1 EntryID FROM Entries ORDER BY EntryID DESC"
+						Using reader = command.ExecuteReader()
+							While reader.Read
+								If Not IsDBNull(reader("EntryID")) Then thisE.SetID(reader("EntryID"))
+							End While
+						End Using
+					End If
+					conn.Close()
+				End Using
+			End Using
+		End If
 
-                    End While
-                End Using
-            End Using
-        End Using
-        Return Nothing
+		Return thisE.EntryID
     End Function
+
+	Private Sub HydrateEntry(ByRef obj As Entry, ByVal r As System.Data.SqlClient.SqlDataReader)
+
+		If Not IsDBNull(r("EntryID")) Then obj.SetID(r("EntryID"))
+		If Not IsDBNull(r("Status")) Then obj.Status = r("Status")
+		If Not IsDBNull(r("EntryType")) Then obj.EntryType = r("EntryType")
+		If Not IsDBNull(r("Image")) AndAlso r("Image").Length > 0 Then obj.Image = r("Image")
+		If Not IsDBNull(r("CreatedDate")) AndAlso Not String.IsNullOrEmpty(r("CreatedDate")) Then obj.SetCreatedDate(CDate(r("CreatedDate")))
+		If Not IsDBNull(r("Amount")) Then obj.Amount = r("Amount")
+		If Not IsDBNull(r("UserID")) Then obj.UserID = r("UserID")
+		If Not IsDBNull(r("UserType")) Then obj.UserID = r("UserType")
+		If Not IsDBNull(r("Description")) Then obj.Description = r("Description")
+		If Not IsDBNull(r("Notes")) Then obj.Notes = r("Notes")
+		If Not IsDBNull(r("LocationID")) Then obj.LocationID = r("LocationID")
+		If Not IsDBNull(r("CategoryID")) Then obj.CategoryID = r("CategoryID")
+
+	End Sub
 
 #End Region
 
 #Region "Location"
 
     Function GetObject_Location(ByVal LocationID As Integer) As Location
-        Return Nothing
+		Dim loc As Objects.Location = Nothing
+		Dim locLst As New Objects.LocationCollection
+
+		Using conn As New SqlConnection(ConnStr)
+			Using command As New SqlCommand(String.Format("SELECT * FROM dbo.Locations WHERE LocationID = '{0}'", LocationID), conn)
+				command.CommandType = System.Data.CommandType.Text
+				conn.Open()
+				Using reader = command.ExecuteReader()
+					While reader.Read
+						Dim newLocation = New Location()
+						HydrateLocation(newLocation, reader)
+						locLst.Add(newLocation)
+					End While
+				End Using
+			End Using
+		End Using
+
+		If locLst.Count > 1 Then
+			Throw New Exception("Duplicate IDs found")
+		ElseIf locLst.Count = 1 Then
+			loc = locLst(0)
+		End If
+
+		Return loc
     End Function
 
-    Function GetCollection_Location(ByVal Filter As _BaseFilter, Optional ByRef ThisCount As Integer = 0) As LocationCollection
-        Return Nothing
-    End Function
+	Function GetCollection_Location(ByVal Filter As LocationFilter, Optional ByRef ThisCount As Integer = 0) As LocationCollection
+		Dim LocColl As New Objects.LocationCollection()
+		Dim obj As New Location()
+
+		Dim FilterStr As String = ""
+		If Filter.ID > 0 Then
+			FilterStr &= String.Format(" AND (LocationID = {0})", Filter.ID)
+		ElseIf Filter.MultiIDs.Count > 0 Then
+			FilterStr &= String.Format(" AND (")
+			Dim isfirst As Boolean = True
+			For Each id As Long In Filter.MultiIDs
+				If isfirst Then isfirst = False Else FilterStr &= String.Format(" OR ")
+				FilterStr &= String.Format("LocationID = {0}", id)
+			Next
+			FilterStr &= String.Format(")")
+		End If
+		If Filter.Status.Count > 0 Then
+			FilterStr &= String.Format(" AND (")
+			Dim isfirst As Boolean = True
+			For Each s As Long In Filter.Status
+				If isfirst Then isfirst = False Else FilterStr &= String.Format(" OR ")
+				FilterStr &= String.Format("Status = {0}", s)
+			Next
+			FilterStr &= String.Format(")")
+		End If
+		If Filter.LocationType <> Enumerations.LocationType.Unknown Then FilterStr &= String.Format(" AND (LocationType = {0}", Filter.LocationType)
+		If Not String.IsNullOrEmpty(Filter.Name) Then FilterStr &= String.Format(" AND (Name LIKE '%{0}%')", Filter.Name)
+		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= String.Format(" AND (Description LIKE '%{0}%')", Filter.Description)
+		If Not String.IsNullOrEmpty(Filter.Url) Then FilterStr &= String.Format(" AND (URL LIKE '%{0}%')", Filter.Url)
+		If Filter.HasImage Then FilterStr &= " AND (Image IS NOT NULL)"
+		If Filter.RangeLength > 0 Then FilterStr &= String.Format(" AND (RowNum <= {0} AND RowNum > {1})", Filter.RangeLength + Filter.RangeBegin, Filter.RangeBegin)
+		If Not String.IsNullOrEmpty(Filter.Sort) Then FilterStr &= String.Format(" ORDER BY {0}", Filter.Sort)
+
+
+		If Filter.CountOnly Then
+			Using conn As New SqlConnection(ConnStr)
+				Dim sqltext As String = String.Format("SELECT COUNT(LocationID) AS 'Count' FROM Locations WHERE 1 = 1{0}", FilterStr)
+				Using command As New SqlCommand(sqltext, conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					Using reader = command.ExecuteReader()
+						While reader.Read
+							If Not IsDBNull(reader("Count")) Then ThisCount = reader("Count")
+						End While
+					End Using
+					conn.Close()
+				End Using
+			End Using
+			Return Nothing
+		Else
+			Using conn As New SqlConnection(ConnStr)
+				Dim sqltext As String = String.Format("SELECT rank() OVER (ORDER BY LocationID) as 'RowNum',* FROM Locations WHERE 1 = 1{0}", FilterStr)
+				Using command As New SqlCommand(sqltext, conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					Using reader = command.ExecuteReader()
+						While reader.Read
+							obj = New Objects.Location
+							HydrateLocation(obj, reader)
+							LocColl.Add(obj)
+						End While
+					End Using
+					conn.Close()
+				End Using
+			End Using
+		End If
+
+		' Return result
+		Return LocColl
+	End Function
 
     Friend Function SaveObject_Location(ByVal thisL As Location) As Long
         Dim QueryStr As String = ""
@@ -489,17 +635,114 @@ Friend Class SQL
         Return Nothing
     End Function
 
+	Private Sub HydrateLocation(ByRef obj As Location, ByVal r As System.Data.SqlClient.SqlDataReader)
+		If Not IsDBNull(r("LocationID")) Then obj.SetID(r("LocationID"))
+		If Not IsDBNull(r("LocationType")) Then obj.LocationType = r("LocationType")
+		If Not IsDBNull(r("Status")) Then obj.Status = r("Status")
+		If Not IsDBNull(r("Description")) Then obj.Description = r("Description")
+		If Not IsDBNull(r("Name")) Then obj.Name = r("Name")
+		If Not IsDBNull(r("URL")) Then obj.URL = r("URL")
+		If Not IsDBNull(r("Image")) AndAlso r("Image").Length > 0 Then obj.Image = r("Image")
+	End Sub
+
 #End Region
 
 #Region "Category"
 
     Function GetObject_Category(ByVal CategoryID As Integer) As Category
-        Return Nothing
+		Dim cat As Objects.Category = Nothing
+		Dim catLst As New Objects.CategoryCollection
+
+		Using conn As New SqlConnection(ConnStr)
+			Using command As New SqlCommand(String.Format("SELECT * FROM dbo.Categories WHERE CategoryID = '{0}'", CategoryID), conn)
+				command.CommandType = System.Data.CommandType.Text
+				conn.Open()
+				Using reader = command.ExecuteReader()
+					While reader.Read
+						Dim newCategory = New Category()
+						HydrateCategory(newCategory, reader)
+						catLst.Add(newCategory)
+					End While
+				End Using
+			End Using
+		End Using
+
+		If catLst.Count > 1 Then
+			Throw New Exception("Duplicate IDs found")
+		ElseIf catLst.Count = 1 Then
+			cat = catLst(0)
+		End If
+
+		Return cat
     End Function
 
-    Function GetCollection_Category(ByVal Filter As _BaseFilter) As CategoryCollection
-        Return Nothing
-    End Function
+	Function GetCollection_Category(ByVal Filter As CategoryFilter, Optional ByRef ThisCount As Integer = 0) As CategoryCollection
+		Dim CatColl As New Objects.CategoryCollection()
+		Dim obj As New Category()
+
+		Dim FilterStr As String = ""
+		If Filter.ID > 0 Then
+			FilterStr &= String.Format(" AND (CategoryID = {0})", Filter.ID)
+		ElseIf Filter.MultiIDs.Count > 0 Then
+			FilterStr &= String.Format(" AND (")
+			Dim isfirst As Boolean = True
+			For Each id As Long In Filter.MultiIDs
+				If isfirst Then isfirst = False Else FilterStr &= String.Format(" OR ")
+				FilterStr &= String.Format("CategoryID = {0}", id)
+			Next
+			FilterStr &= String.Format(")")
+		End If
+		If Filter.Status.Count > 0 Then
+			FilterStr &= String.Format(" AND (")
+			Dim isfirst As Boolean = True
+			For Each s As Long In Filter.Status
+				If isfirst Then isfirst = False Else FilterStr &= String.Format(" OR ")
+				FilterStr &= String.Format("Status = {0}", s)
+			Next
+			FilterStr &= String.Format(")")
+		End If
+		If Not String.IsNullOrEmpty(Filter.Name) Then FilterStr &= String.Format(" AND (Name LIKE '%{0}%')", Filter.Name)
+		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= String.Format(" AND (Description LIKE '%{0}%')", Filter.Description)
+		If Filter.RangeLength > 0 Then FilterStr &= String.Format(" AND (RowNum <= {0} AND RowNum > {1})", Filter.RangeLength + Filter.RangeBegin, Filter.RangeBegin)
+		If Not String.IsNullOrEmpty(Filter.Sort) Then FilterStr &= String.Format(" ORDER BY {0}", Filter.Sort)
+
+
+		If Filter.CountOnly Then
+			Using conn As New SqlConnection(ConnStr)
+				Dim sqltext As String = String.Format("SELECT COUNT(CategoryID) AS 'Count' FROM Categories WHERE 1 = 1{0}", FilterStr)
+				Using command As New SqlCommand(sqltext, conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					Using reader = command.ExecuteReader()
+						While reader.Read
+							If Not IsDBNull(reader("Count")) Then ThisCount = reader("Count")
+						End While
+					End Using
+					conn.Close()
+				End Using
+			End Using
+			Return Nothing
+		Else
+			Using conn As New SqlConnection(ConnStr)
+				Dim sqltext As String = String.Format("SELECT rank() OVER (ORDER BY CategoryID) as 'RowNum',* FROM Categories WHERE 1 = 1{0}", FilterStr)
+				Using command As New SqlCommand(sqltext, conn)
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					Using reader = command.ExecuteReader()
+						While reader.Read
+							obj = New Objects.Category
+							HydrateCategory(obj, reader)
+							CatColl.Add(obj)
+						End While
+					End Using
+					conn.Close()
+				End Using
+			End Using
+		End If
+
+		' Return result
+		Return CatColl
+	End Function
 
     Friend Function SaveObject_Category(ByVal thisL As Category) As Long
         Dim QueryStr As String = ""
@@ -528,6 +771,13 @@ Friend Class SQL
         End Using
         Return Nothing
     End Function
+
+	Private Sub HydrateCategory(ByRef obj As Category, ByVal r As System.Data.SqlClient.SqlDataReader)
+		If Not IsDBNull(r("CategoryID")) Then obj.SetID(r("CategoryID"))
+		If Not IsDBNull(r("Status")) Then obj.Status = r("Status")
+		If Not IsDBNull(r("Description")) Then obj.Description = r("Description")
+		If Not IsDBNull(r("Name")) Then obj.Name = r("Name")
+	End Sub
 
 #End Region
 

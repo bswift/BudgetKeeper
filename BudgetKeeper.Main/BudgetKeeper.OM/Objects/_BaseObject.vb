@@ -4,16 +4,6 @@
 
 #Region "Properties"
 
-		Friend m_ChangeFlag As Enumerations.ChangeFlag = Enumerations.ChangeFlag.NoChange
-		Public Property ChangeFlag As Enumerations.ChangeFlag
-			Get
-				Return m_ChangeFlag
-			End Get
-			Set(value As Enumerations.ChangeFlag)
-				m_ChangeFlag = value
-			End Set
-		End Property
-
 		Friend m_ObjectID As Long = 0
 		Public ReadOnly Property ID As Long
 			Get
@@ -104,7 +94,6 @@
 			If c Is Nothing Then Throw New Exception("No connector found, cannot save object.")
 
 			m_ObjectID = c.SaveBase(Me)
-			Me.ChangeFlag = Enumerations.ChangeFlag.NoChange
 
 			Return m_ObjectID
 		End Function
@@ -165,7 +154,6 @@
 				Throw New Exception("Object type does not match collection type.  Cannot Add.")
 			End If
 
-			item.ChangeFlag = Enumerations.ChangeFlag.Add
 			item.Parent = Me
 			m_ThisList.Add(item)
 
@@ -222,7 +210,7 @@
 
 			For Each thing In m_ThisList
 				If thing.ID = item.ID Then
-					thing.ChangeFlag = Enumerations.ChangeFlag.Delete
+					'TODO: Add delete function
 				End If
 			Next
 
@@ -231,7 +219,7 @@
 
 		Public Overridable Function Delete(index As Integer) As Boolean
 			If index > -1 AndAlso index < m_ThisList.Count AndAlso m_ThisList(index) IsNot Nothing Then
-				m_ThisList(index).ChangeFlag = Enumerations.ChangeFlag.Delete
+				'TODO: Add delete function
 			End If
 
 			Return True
@@ -250,7 +238,6 @@
 				Throw New Exception("Object type does not match collection type.  Cannot Insert.")
 			End If
 
-			item.ChangeFlag = Enumerations.ChangeFlag.Add
 			item.Parent = Me
 			m_ThisList.Insert(index, item)
 			m_ListCount += 1
@@ -270,7 +257,6 @@
 				Return m_ThisList(index)
 			End Get
 			Set(value As _Base)
-				value.ChangeFlag = Enumerations.ChangeFlag.Add
 				value.Parent = Me
 				m_ThisList(index) = value
 			End Set
@@ -350,10 +336,6 @@
             Else
                 Me.ExtraProperties("derp") = True
                 c.GetBaseCollection(Me)
-
-                For Each item As _Base In Me
-                    item.ChangeFlag = Enumerations.ChangeFlag.NoChange
-                Next
 
                 m_ListCount = m_ThisList.Count
             End If
