@@ -29,13 +29,14 @@ Friend Class SQL
 						If Not IsDBNull(reader("Password")) AndAlso Not String.IsNullOrEmpty(reader("Password")) Then newUser.Password = reader("Password")
                         If Not IsDBNull(reader("Name")) AndAlso Not String.IsNullOrEmpty(reader("Name")) Then newUser.FullName = reader("Name")
                         If Not IsDBNull(reader("Email")) AndAlso Not String.IsNullOrEmpty(reader("Email")) Then newUser.Email = reader("Email")
-                        If Not IsDBNull(reader("Phone")) AndAlso Not String.IsNullOrEmpty(reader("Phone")) Then newUser.Username = reader("Phone")
+                        If Not IsDBNull(reader("Phone")) AndAlso Not String.IsNullOrEmpty(reader("Phone")) Then newUser.Phone = reader("Phone")
                         If Not IsDBNull(reader("CreatedDate")) AndAlso Not String.IsNullOrEmpty(reader("CreatedDate")) Then newUser.SetCreatedDate(CDate(reader("CreatedDate")))
                         If Not IsDBNull(reader("LastLogin")) AndAlso Not String.IsNullOrEmpty(reader("LastLogin")) Then newUser.SetLastLogin(CDate(reader("LastLogin")))
 
                         uColl.Add(newUser)
                     End While
                 End Using
+                conn.Close()
             End Using
             If uColl.Count < 1 Then
                 Using command As New SqlCommand(String.Format("SELECT * FROM dbo.Users WHERE Username = '{0}'", Username), conn)
@@ -53,13 +54,14 @@ Friend Class SQL
                             If Not IsDBNull(reader("Password")) AndAlso Not String.IsNullOrEmpty(reader("Password")) Then newUser.Password = reader("Password")
                             If Not IsDBNull(reader("Name")) AndAlso Not String.IsNullOrEmpty(reader("Name")) Then newUser.FullName = reader("Name")
                             If Not IsDBNull(reader("Email")) AndAlso Not String.IsNullOrEmpty(reader("Email")) Then newUser.Email = reader("Email")
-                            If Not IsDBNull(reader("Phone")) AndAlso Not String.IsNullOrEmpty(reader("Phone")) Then newUser.Username = reader("Phone")
+                            If Not IsDBNull(reader("Phone")) AndAlso Not String.IsNullOrEmpty(reader("Phone")) Then newUser.Phone = reader("Phone")
                             If Not IsDBNull(reader("CreatedDate")) AndAlso Not String.IsNullOrEmpty(reader("CreatedDate")) Then newUser.SetCreatedDate(CDate(reader("CreatedDate")))
                             If Not IsDBNull(reader("LastLogin")) AndAlso Not String.IsNullOrEmpty(reader("LastLogin")) Then newUser.SetLastLogin(CDate(reader("LastLogin")))
 
                             uColl.Add(newUser)
                         End While
                     End Using
+                    conn.Close()
                 End Using
                 If uColl.Count < 1 Then
                     Throw New Exception("Username not found")
@@ -190,12 +192,10 @@ Friend Class SQL
             Next
             FilterStr &= String.Format(")")
         End If
-        If Not String.IsNullOrEmpty(Filter.Username) Then FilterStr &= " AND (Username = '" & Filter.Email & "')"
+        If Not String.IsNullOrEmpty(Filter.Username) Then FilterStr &= " AND (Username = '" & Filter.Username & "')"
         If Not String.IsNullOrEmpty(Filter.Phone) Then FilterStr &= " AND (Phone = '" & Filter.Phone & "')"
         If Not String.IsNullOrEmpty(Filter.Email) Then FilterStr &= " AND (Email = '" & Filter.Email & "')"
         If Not String.IsNullOrEmpty(Filter.Name) Then FilterStr &= " AND (Name = '" & Filter.Name & "')"
-        If Filter.CategoryID > 0 Then FilterStr &= " AND (CategoryID = " & Filter.CategoryID & ")"
-        If Filter.LocationID > 0 Then FilterStr &= " AND (LocationID = " & Filter.LocationID & ")"
         If Filter.CreatedDateFrom > CDate("1/1/2000") Then FilterStr &= String.Format(" AND (CreatedDate >= '{0}')", Filter.CreatedDateFrom)
         If Filter.CreatedDateTo > CDate("1/1/2000") Then FilterStr &= String.Format(" AND (CreatedDate <= '{0}')", Filter.CreatedDateTo)
         If Filter.LastLoginFrom > CDate("1/1/2000") Then FilterStr &= String.Format(" AND (LastLogin >= '{0}')", Filter.LastLoginFrom)
@@ -218,7 +218,8 @@ Friend Class SQL
             Return Nothing
         Else
             Using conn As New SqlConnection(ConnStr)
-                Using command As New SqlCommand(String.Format("SELECT rank() OVER (ORDER BY UserID) as 'RowNum',* FROM Users {0} WHERE 1 = 1", FilterStr), conn)
+                Dim sqltext As String = String.Format("SELECT rank() OVER (ORDER BY UserID) as 'RowNum',* FROM Users WHERE 1 = 1{0}", FilterStr)
+                Using command As New SqlCommand(sqltext, conn)
                     command.CommandType = System.Data.CommandType.Text
                     conn.Open()
                     Using reader As System.Data.SqlClient.SqlDataReader = command.ExecuteReader()
@@ -251,7 +252,8 @@ Friend Class SQL
             If thisU.Status <> Enumerations.UserStatus.Unknown Then QueryStr &= ", Status = " & CType(thisU.Status, Integer).ToString()
             QueryStr &= " WHERE UserID = " & thisU.UserID
             Using conn As New SqlConnection(ConnStr)
-                Using command As New SqlCommand(String.Format("UPDATE Users SET {0}", QueryStr), conn)
+                Dim sqltext As String = String.Format("UPDATE Users SET {0}", QueryStr)
+                Using command As New SqlCommand(sqltext, conn)
                     command.CommandType = System.Data.CommandType.Text
                     conn.Open()
                     command.ExecuteNonQuery()

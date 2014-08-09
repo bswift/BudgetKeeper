@@ -333,26 +333,6 @@
             End Set
         End Property
 
-        Private m_LocationID As Long = 0
-        Public Property LocationID As Long
-            Get
-                Return m_LocationID
-            End Get
-            Set(value As Long)
-                m_LocationID = value
-            End Set
-        End Property
-
-        Private m_CategoryID As Long = 0
-        Public Property CategoryID As Long
-            Get
-                Return m_LocationID
-            End Get
-            Set(value As Long)
-                m_CategoryID = value
-            End Set
-        End Property
-
 		Private m_Status As New Generic.List(Of Integer)
 		Public Property Status As Generic.List(Of Integer)
 			Get

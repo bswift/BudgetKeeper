@@ -120,15 +120,8 @@ Public Class Connector
 		End Select
 
 		If inbase IsNot Nothing Then
-			inbase.SetID(ID)
-
-			'If inbase.ObjectType = Enumerations.ObjectType.CachedMessage Then
-			'    If m_LoginType <> Enumerations.LoginType.Admin Then Throw New Exception("You do not have permission to view this post.")
-			'    inbase = SQL.GetPost(ID)
-			'    Return inbase
-			'Else
+            inbase.SetID(ID)
 			GetBase(inbase)
-			'  End If
 		End If
 
 		If inbase.ID > 0 Then
@@ -250,7 +243,7 @@ Public Class Connector
 			End If
 		Catch ex As Exception
 			LogOut()
-			Throw ex
+            Throw New Exception(ex.Message)
 		End Try
 
 		Return Nothing

@@ -47,7 +47,9 @@
                     obj.SetCreatedDate(DateTime.Now)
                     obj.SetLastLogin(DateTime.Now)
                 End If
-                obj.Password = enc.EncryptString(obj.Password)
+                If Not String.IsNullOrEmpty(obj.Password) Then
+                    obj.Password = enc.EncryptString(obj.Password)
+                End If
                 objID = m_SQL.SaveObject_User(obj)
             End If
         Else
@@ -212,7 +214,7 @@
             Dim EncPass As String = aes.EncryptString(Pass)
 
             Dim thisuser As Objects.User = m_SQL.LogIn(Username, EncPass)
-            thisuser.Password = ""
+            thisuser.Password = Nothing
             Dim tempDate As DateTime = thisuser.LastLogin
             thisuser.SetLastLogin(DateTime.Now)
             thisuser.SaveID = thisuser.UserID
@@ -307,6 +309,7 @@
             If u.Status <> 1 Then Throw New Exception("You do not have permission to view this User.")
         End If
 
+        InUser = u
         InUser.Password = ""
 
     End Sub

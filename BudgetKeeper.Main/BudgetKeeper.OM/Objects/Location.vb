@@ -55,6 +55,16 @@
             End Set
         End Property
 
+        Private m_Image As Byte() = Nothing
+        Public Property Image As Byte()
+            Get
+                Return m_Image
+            End Get
+            Set(ByVal value As Byte())
+                m_Image = value
+            End Set
+        End Property
+
 
 #End Region
 
@@ -99,6 +109,26 @@
             End Get
             Set(value As String)
                 m_Description = value
+            End Set
+        End Property
+
+        Private m_Url As String = ""
+        Public Property Url As String
+            Get
+                Return m_Url
+            End Get
+            Set(value As String)
+                m_Url = value
+            End Set
+        End Property
+
+        Private m_hasImage As Boolean = False
+        Public Property HasImage As Boolean
+            Get
+                Return m_hasImage
+            End Get
+            Set(value As Boolean)
+                m_hasImage = value
             End Set
         End Property
 

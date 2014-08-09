@@ -34,6 +34,11 @@
 		Admin = 1
 		Editor = 2
 		Viewer = 3
-	End Enum
+    End Enum
+
+    Enum EntryType
+        Unknown = -1
+        Generic = 0
+    End Enum
 
 End Class
