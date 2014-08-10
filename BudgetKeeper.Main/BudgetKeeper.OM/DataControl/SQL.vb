@@ -399,57 +399,111 @@ Friend Class SQL
 			Next
 			FilterStr &= String.Format(")")
 		End If
-		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= String.Format(" AND ([Description] LIKE '%{0}%')", Filter.Description)
-		If Not String.IsNullOrEmpty(Filter.Notes) Then FilterStr &= String.Format(" AND (Notes = '%{0}%')", Filter.Notes)
-		If Filter.CategoryID > 0 Then FilterStr &= String.Format(" AND (CategoryID = {0})", Filter.CategoryID)
-		If Filter.LocationID > 0 Then FilterStr &= String.Format(" AND (LocationID = {0})", Filter.LocationID)
-		If Filter.AmountFrom > -1.0 Then FilterStr &= String.Format("AND (Amount >= {0}", Filter.AmountFrom)
-		If Filter.AmountTo > -1.0 Then FilterStr &= String.Format(" AND (Amount <= {0}", Filter.AmountTo)
-		If Filter.EntryType <> Enumerations.EntryType.Unknown Then FilterStr &= String.Format(" AND (EntryType = {0}", Filter.EntryType)
-		If Filter.UserID > 0 Then FilterStr &= String.Format(" AND (UserID = {0}", Filter.UserID)
-		If Filter.UserType <> Enumerations.UserType.Unknown Then FilterStr &= String.Format(" AND (UserType = {0}", Filter.UserType)
-		If Filter.HasImage Then FilterStr &= " AND (Image IS NOT NULL)"
-		If Filter.CreatedDateFrom > CDate("1/1/2000") Then FilterStr &= String.Format(" AND (CreatedDate >= '{0}')", Filter.CreatedDateFrom)
-		If Filter.CreatedDateTo > CDate("1/1/2000") Then FilterStr &= String.Format(" AND (CreatedDate <= '{0}')", Filter.CreatedDateTo)
-		If Filter.RangeLength > 0 Then FilterStr &= String.Format(" AND (RowNum <= {0} AND RowNum > {1})", Filter.RangeLength + Filter.RangeBegin, Filter.RangeBegin)
-		If Not String.IsNullOrEmpty(Filter.Sort) Then FilterStr &= String.Format(" ORDER BY {0}", Filter.Sort)
+		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= " AND ([Description] LIKE @Description)"
+		If Not String.IsNullOrEmpty(Filter.Notes) Then FilterStr &= " AND (Notes = @Notes)"
+		If Filter.CategoryID > 0 Then FilterStr &= " AND (CategoryID = @CategoryID)"
+		If Filter.LocationID > 0 Then FilterStr &= " AND (LocationID = @LocationID)"
+		If Filter.AmountFrom > -1.0 Then FilterStr &= "AND (Amount >= @AmountFrom"
+		If Filter.AmountTo > -1.0 Then FilterStr &= " AND (Amount <= @AmountTo"
+		If Filter.EntryType <> Enumerations.EntryType.Unknown Then FilterStr &= " AND (EntryType = @EntryType"
+		If Filter.UserID > 0 Then FilterStr &= " AND (UserID = @UserID"
+		If Filter.UserType <> Enumerations.UserType.Unknown Then FilterStr &= " AND (UserType = @UserType"
+		If Filter.HasImage Then FilterStr &= " AND (DATALENGTH(Image) > 0)"
+		If Filter.CreatedDateFrom > CDate("1/1/2000") Then FilterStr &= " AND (CreatedDate >= @CreatedDateFrom)"
+		If Filter.CreatedDateTo > CDate("1/1/2000") Then FilterStr &= " AND (CreatedDate <= @CreatedDateTo)"
+		If Filter.RangeLength > 0 Then FilterStr &= " AND (RowNum <= (@RangeLength + @RangeBegin) AND RowNum > @RangeBegin)"
+		If Not String.IsNullOrEmpty(Filter.Sort) Then FilterStr &= " ORDER BY @Sort"
 
-
+		Dim sqltext As String = ""
 		If Filter.CountOnly Then
-			Using conn As New SqlConnection(ConnStr)
-				Dim sqltext As String = String.Format("SELECT COUNT(EntryID) AS 'Count' FROM Entries WHERE 1 = 1{0}", FilterStr)
-				Using command As New SqlCommand(sqltext, conn)
-					command.CommandType = System.Data.CommandType.Text
-					conn.Open()
-					Using reader = command.ExecuteReader()
-						While reader.Read
-							If Not IsDBNull(reader("Count")) Then ThisCount = reader("Count")
-						End While
-					End Using
-					conn.Close()
-				End Using
-			End Using
-			Return Nothing
+			sqltext = String.Format("SELECT COUNT(EntryID) AS 'Count' FROM Entries WHERE 1 = 1{0}", FilterStr)
 		Else
-			Using conn As New SqlConnection(ConnStr)
-				Dim sqltext As String = String.Format("SELECT rank() OVER (ORDER BY EntryID) as 'RowNum',* FROM Entries WHERE 1 = 1{0}", FilterStr)
-				Using command As New SqlCommand(sqltext, conn)
-					command.CommandType = System.Data.CommandType.Text
-					conn.Open()
-					Using reader = command.ExecuteReader()
-						While reader.Read
+			sqltext = String.Format("SELECT rank() OVER (ORDER BY EntryID) as 'RowNum',* FROM Entries WHERE 1 = 1{0}", FilterStr)
+		End If
+
+		Using conn As New SqlConnection(ConnStr)
+			Using command As New SqlCommand(sqltext, conn)
+				command.CommandType = System.Data.CommandType.Text
+
+				If Not String.IsNullOrEmpty(Filter.Description) Then
+					command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 200))
+					command.Parameters("@Description").Value = "%" & Filter.Description & "%"
+				End If
+				If Not String.IsNullOrEmpty(Filter.Notes) Then
+					command.Parameters.Add(New SqlParameter("@Notes", SqlDbType.VarChar, 2000))
+					command.Parameters("@Notes").Value = "%" & Filter.Notes & "%"
+				End If
+				If Filter.CategoryID > 0 Then
+					command.Parameters.Add(New SqlParameter("@CategoryID", SqlDbType.Int))
+					command.Parameters("@CategoryID").Value = Filter.CategoryID
+				End If
+				If Filter.LocationID > 0 Then
+					command.Parameters.Add(New SqlParameter("@LocationID", SqlDbType.Int))
+					command.Parameters("@LocationID").Value = Filter.LocationID
+				End If
+				If Filter.AmountFrom > -1.0 Then
+					command.Parameters.Add(New SqlParameter("@AmountFrom", SqlDbType.Decimal))
+					command.Parameters("@AmountFrom").Value = Filter.AmountFrom
+				End If
+				If Filter.AmountTo > -1.0 Then
+					command.Parameters.Add(New SqlParameter("@AmountTo", SqlDbType.Decimal))
+					command.Parameters("@AmountTo").Value = Filter.AmountTo
+				End If
+				If Filter.EntryType <> Enumerations.EntryType.Unknown Then
+					command.Parameters.Add(New SqlParameter("@EntryType", SqlDbType.Int))
+					command.Parameters("@EntryType").Value = Filter.EntryType
+				End If
+				If Filter.UserID > 0 Then
+					command.Parameters.Add(New SqlParameter("@UserID", SqlDbType.Int))
+					command.Parameters("@UserID").Value = Filter.UserID
+				End If
+				If Filter.UserType <> Enumerations.UserType.Unknown Then
+					command.Parameters.Add(New SqlParameter("@UserType", SqlDbType.Int))
+					command.Parameters("@UserType").Value = Filter.UserType
+				End If
+				If Filter.CreatedDateFrom > CDate("1/1/2000") Then
+					command.Parameters.Add(New SqlParameter("@CreatedDateFrom", SqlDbType.DateTime))
+					command.Parameters("@CreatedDateFrom").Value = Filter.CreatedDateFrom
+				End If
+				If Filter.CreatedDateTo > CDate("1/1/2000") Then
+					command.Parameters.Add(New SqlParameter("@CreatedDateTo", SqlDbType.DateTime))
+					command.Parameters("@CreatedDateTo").Value = Filter.CreatedDateTo
+				End If
+				If Filter.RangeLength > 0 Then
+					command.Parameters.Add(New SqlParameter("@RangeLength", SqlDbType.Int))
+					command.Parameters("@RangeLength").Value = Filter.RangeLength
+				End If
+				If Filter.RangeBegin > 0 Then
+					command.Parameters.Add(New SqlParameter("@RangeBegin", SqlDbType.Int))
+					command.Parameters("@RangeBegin").Value = Filter.RangeBegin
+				End If
+				If Not String.IsNullOrEmpty(Filter.Sort) Then
+					command.Parameters.Add(New SqlParameter("@Sort", SqlDbType.VarChar, 30))
+					command.Parameters("@Sort").Value = Filter.Sort
+				End If
+
+				conn.Open()
+				Using reader = command.ExecuteReader()
+					While reader.Read
+						If Filter.CountOnly Then
+							If Not IsDBNull(reader("Count")) Then ThisCount = reader("Count")
+						Else
 							obj = New Objects.Entry
 							HydrateEntry(obj, reader)
 							eColl.Add(obj)
-						End While
-					End Using
-					conn.Close()
+						End If
+					End While
 				End Using
+				conn.Close()
 			End Using
+		End Using
+
+		If Filter.CountOnly Then
+			Return Nothing
+		Else
+			Return eColl
 		End If
 
-		' Return result
-		Return eColl
 	End Function
 
     Friend Function SaveObject_Entry(ByVal thisE As Entry) As Long
