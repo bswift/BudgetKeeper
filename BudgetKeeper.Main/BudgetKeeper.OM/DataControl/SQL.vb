@@ -237,47 +237,86 @@ Friend Class SQL
     End Function
 
     Friend Function SaveObject_User(ByVal thisU As User) As Long
-        Dim QueryStr As String = ""
+		Dim QueryStr As String = ""
+		Dim Query2 As String = ""
 
-        If thisU.UserID > 0 OrElse thisU.SaveID > 0 Then
-            If thisU.UserID = 0 Then thisU.UserID = thisU.SaveID
-            If Not String.IsNullOrEmpty(thisU.FullName) Then QueryStr &= "Name = '" & thisU.FullName & "'"
-            If Not String.IsNullOrEmpty(thisU.Username) Then QueryStr &= ", Username = '" & thisU.Username & "'"
-            If Not String.IsNullOrEmpty(thisU.Password) Then QueryStr &= ", Password = '" & thisU.Password & "'"
-            If thisU.UserType <> Enumerations.UserType.Unknown Then QueryStr &= ", UserType = " & thisU.UserType.ToString()
-            If Not String.IsNullOrEmpty(thisU.Email) Then QueryStr &= ", Email = '" & thisU.Email & "'"
-            If Not String.IsNullOrEmpty(thisU.Phone) Then QueryStr &= ", Phone = '" & thisU.Phone & "'"
-            If thisU.CreatedDate <> CDate("1/1/2000") Then QueryStr &= ", CreatedDate = '" & thisU.CreatedDate.ToString() & "'"
-			If thisU.LastLogin <> CDate("1/1/2000") Then QueryStr &= ", LastLogin = '" & thisU.LastLogin.ToString() & "'"
-			If thisU.Image IsNot Nothing AndAlso thisU.Image.Length > 0 Then QueryStr &= ", Image = " & System.Text.Encoding.UTF8.GetString(thisU.Image)
-			If thisU.Status <> Enumerations.UserStatus.Unknown Then QueryStr &= ", [Status] = " & CType(thisU.Status, Integer).ToString()
-            QueryStr &= " WHERE UserID = " & thisU.UserID
-            Using conn As New SqlConnection(ConnStr)
-                Dim sqltext As String = String.Format("UPDATE Users SET {0}", QueryStr)
-                Using command As New SqlCommand(sqltext, conn)
-                    command.CommandType = System.Data.CommandType.Text
-                    conn.Open()
-                    command.ExecuteNonQuery()
-                    conn.Close()
-                End Using
-            End Using
-        Else
-            ' Create a new user '
-			QueryStr &= "Username, Password, UserType, Name, Email, Phone, CreatedDate, LastLogin, Image, [Status]"
-            Dim Query2 As String = ""
-            If Not String.IsNullOrEmpty(thisU.Username) Then  Query2 &= "'" & thisU.Username & "', "
-			If Not String.IsNullOrEmpty(thisU.Password) Then Query2 &= "'" & thisU.Password & "', " Else Query2 &= "NULL, "
-			If thisU.UserType <> Nothing AndAlso thisU.UserType <> Enumerations.UserType.Unknown Then Query2 &= thisU.UserType.ToString() & ", " Else Query2 &= "NULL, "
-			If Not String.IsNullOrEmpty(thisU.FullName) Then Query2 &= "'" & thisU.FullName & "', " Else Query2 &= "NULL, "
-			If Not String.IsNullOrEmpty(thisU.Email) Then Query2 &= "'" & thisU.Email & "', " Else Query2 &= "NULL, "
-			If Not String.IsNullOrEmpty(thisU.Phone) Then Query2 &= "'" & thisU.Phone & "', " Else Query2 &= "NULL, "
-			If thisU.CreatedDate <> Nothing AndAlso thisU.CreatedDate <> CDate("01/01/2000") Then Query2 &= "'" & thisU.CreatedDate.ToString() & "', " Else Query2 &= "NULL, "
-			If thisU.LastLogin <> Nothing AndAlso thisU.LastLogin <> CDate("01/01/2000") Then Query2 &= "'" & thisU.LastLogin.ToString() & "', " Else Query2 &= "NULL, "
-			If thisU.Image IsNot Nothing AndAlso thisU.Image.Length > 0 Then Query2 &= System.Text.Encoding.UTF8.GetString(thisU.Image) & ", " Else Query2 &= "NULL, "
-			If thisU.Status <> Nothing AndAlso thisU.Status <> Enumerations.UserStatus.Unknown Then Query2 &= CType(thisU.Status, Integer).ToString() Else Query2 &= "NULL"
+
+		If thisU.UserID > 0 OrElse thisU.SaveID > 0 Then
+			If thisU.UserID = 0 Then thisU.UserID = thisU.SaveID
+
+			If Not String.IsNullOrEmpty(thisU.FullName) Then QueryStr &= "Name = @Name"
+			If Not String.IsNullOrEmpty(thisU.Username) Then QueryStr &= ", Username = @Username"
+			If Not String.IsNullOrEmpty(thisU.Password) Then QueryStr &= ", Password = @Password"
+			If thisU.UserType <> Enumerations.UserType.Unknown Then QueryStr &= ", UserType = @UserType"
+			If Not String.IsNullOrEmpty(thisU.Email) Then QueryStr &= ", Email = @Email"
+			If Not String.IsNullOrEmpty(thisU.Phone) Then QueryStr &= ", Phone = @Phone"
+			If thisU.CreatedDate <> CDate("1/1/2000") Then QueryStr &= ", CreatedDate = @CreatedDate"
+			If thisU.LastLogin <> CDate("1/1/2000") Then QueryStr &= ", LastLogin = @LastLogin"
+			If thisU.Image IsNot Nothing AndAlso thisU.Image.Length > 0 Then QueryStr &= ", Image = @Image"
+			If thisU.Status <> Enumerations.UserStatus.Unknown Then QueryStr &= ", [Status] = @Status"
+
+			QueryStr &= " WHERE UserID = " & thisU.UserID
+			Using conn As New SqlConnection(ConnStr)
+				Dim sqltext As String = String.Format("UPDATE Users SET {0}", QueryStr)
+				Using command As New SqlCommand(sqltext, conn)
+					command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
+					command.Parameters.Add(New SqlParameter("@Username", SqlDbType.VarChar, 100))
+					command.Parameters.Add(New SqlParameter("@Password", SqlDbType.VarChar, 100))
+					command.Parameters.Add(New SqlParameter("@UserType", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@Email", SqlDbType.VarChar, 100))
+					command.Parameters.Add(New SqlParameter("@Phone", SqlDbType.VarChar, 100))
+					command.Parameters.Add(New SqlParameter("@CreatedDate", SqlDbType.DateTime))
+					command.Parameters.Add(New SqlParameter("@LastLogin", SqlDbType.DateTime))
+					command.Parameters.Add(New SqlParameter("@Image", SqlDbType.Image))
+					command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
+
+					If Not String.IsNullOrEmpty(thisU.FullName) Then command.Parameters("@Name").Value = thisU.FullName Else command.Parameters("@Name").Value = ""
+					If Not String.IsNullOrEmpty(thisU.Username) Then command.Parameters("@Username").Value = thisU.Username Else command.Parameters("@Username").Value = ""
+					If Not String.IsNullOrEmpty(thisU.Password) Then command.Parameters("@Password").Value = thisU.Password Else command.Parameters("@Password").Value = ""
+					If thisU.UserType <> Enumerations.UserType.Unknown Then command.Parameters("@UserType").Value = thisU.UserType Else command.Parameters("@UserType").Value = -1
+					If Not String.IsNullOrEmpty(thisU.Email) Then command.Parameters("@Email").Value = thisU.Email Else command.Parameters("@Email").Value = ""
+					If Not String.IsNullOrEmpty(thisU.Phone) Then command.Parameters("@Phone").Value = thisU.Phone Else command.Parameters("@Phone").Value = ""
+					If thisU.CreatedDate <> CDate("1/1/2000") Then command.Parameters("@CreatedDate").Value = thisU.CreatedDate Else command.Parameters("@CreatedDate").Value = CDate("01/01/2000")
+					If thisU.LastLogin <> CDate("1/1/2000") Then command.Parameters("@LastLogin").Value = thisU.LastLogin Else command.Parameters("@LastLogin").Value = CDate("01/01/2000")
+					If thisU.Image IsNot Nothing AndAlso thisU.Image.Length > 0 Then command.Parameters("@Image").Value = thisU.Image Else command.Parameters("@Image").Value = New Byte() {}
+					If thisU.Status <> Enumerations.UserStatus.Unknown Then command.Parameters("@Status").Value = thisU.Status Else command.Parameters("@Status").Value = -1
+
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					command.ExecuteNonQuery()
+					conn.Close()
+				End Using
+			End Using
+		Else
+			' Create a new user '
+			QueryStr = "Username, Password, UserType, Name, Email, Phone, CreatedDate, LastLogin, Image, [Status]"
+			Query2 = "@Username, @Password, @UserType, @Name, @Email, @Phone, @CreatedDate, @LastLogin, @Image, @Status"
 
 			Using conn As New SqlConnection(ConnStr)
 				Using command As New SqlCommand(String.Format("INSERT INTO Users ({0}) VALUES ({1});", QueryStr, Query2), conn)
+					command.Parameters.Add(New SqlParameter("@Username", SqlDbType.VarChar, 100))
+					command.Parameters.Add(New SqlParameter("@Password", SqlDbType.VarChar, 100))
+					command.Parameters.Add(New SqlParameter("@UserType", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
+					command.Parameters.Add(New SqlParameter("@Email", SqlDbType.VarChar, 100))
+					command.Parameters.Add(New SqlParameter("@Phone", SqlDbType.VarChar, 10))
+					command.Parameters.Add(New SqlParameter("@CreatedDate", SqlDbType.DateTime))
+					command.Parameters.Add(New SqlParameter("@LastLogin", SqlDbType.DateTime))
+					command.Parameters.Add(New SqlParameter("@Image", SqlDbType.Image))
+					command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
+
+					If Not String.IsNullOrEmpty(thisU.Username) Then command.Parameters("@Username").Value = thisU.Username Else command.Parameters("@Username").Value = ""
+
+					If Not String.IsNullOrEmpty(thisU.Password) Then command.Parameters("@Password").Value = thisU.Password Else command.Parameters("@Password").Value = ""
+					If thisU.UserType <> Nothing AndAlso thisU.UserType <> Enumerations.UserType.Unknown Then command.Parameters("@UserType").Value = CType(thisU.UserType, Integer) Else command.Parameters("@UserType").Value = -1
+					If Not String.IsNullOrEmpty(thisU.FullName) Then command.Parameters("@Name").Value = thisU.FullName Else command.Parameters("@Name").Value = ""
+					If Not String.IsNullOrEmpty(thisU.Email) Then command.Parameters("@Email").Value = thisU.Email Else command.Parameters("@Email").Value = ""
+					If Not String.IsNullOrEmpty(thisU.Phone) Then command.Parameters("@Phone").Value = thisU.Phone Else command.Parameters("@Phone").Value = ""
+					If thisU.CreatedDate <> Nothing AndAlso thisU.CreatedDate <> CDate("01/01/2000") Then command.Parameters("@CreatedDate").Value = thisU.CreatedDate Else command.Parameters("@CreatedDate").Value = CDate("01/01/2000")
+					If thisU.LastLogin <> Nothing AndAlso thisU.LastLogin <> CDate("01/01/2000") Then command.Parameters("@LastLogin").Value = thisU.LastLogin Else command.Parameters("@LastLogin").Value = CDate("01/01/2000")
+					If thisU.Image IsNot Nothing AndAlso thisU.Image.Length > 0 Then command.Parameters("@Image").Value = thisU.Image Else command.Parameters("@Image").Value = New Byte() {}
+					If thisU.Status <> Nothing AndAlso thisU.Status <> Enumerations.UserStatus.Unknown Then command.Parameters("@Status").Value = thisU.Status Else command.Parameters("@Status").Value = -1
+
 					command.CommandType = System.Data.CommandType.Text
 					conn.Open()
 					Dim RowsAffected As Integer = 0
@@ -296,7 +335,7 @@ Friend Class SQL
 		End If
 
 		Return thisU.UserID
-    End Function
+	End Function
 
     Private Sub HydrateUser(ByRef obj As User, ByVal r As System.Data.SqlClient.SqlDataReader)
 
@@ -424,25 +463,50 @@ Friend Class SQL
 	End Function
 
     Friend Function SaveObject_Entry(ByVal thisE As Entry) As Long
-		Dim QueryStr As String = ""
+		Dim QueryStr As String = "UPDATE Entries SET "
 
 		If thisE.EntryID > 0 OrElse thisE.SaveID > 0 Then
 			If thisE.EntryID = 0 Then thisE.EntryID = thisE.SaveID
-			If Not String.IsNullOrEmpty(thisE.Description) Then QueryStr &= String.Format("[Description] = '{0}'", thisE.Description)
-			If thisE.Amount > 0.0 Then QueryStr &= String.Format(", Amount = {0}", thisE.Amount.ToString())
-			If thisE.EntryType <> Enumerations.EntryType.Unknown Then QueryStr &= String.Format(", EntryType = {0}", thisE.EntryType.ToString())
-			If Not String.IsNullOrEmpty(thisE.Notes) Then QueryStr &= String.Format(", Notes = '{0}'", thisE.Notes)
-			If thisE.LocationID > 0 Then QueryStr &= String.Format(", LocationID = {0}", thisE.LocationID.ToString())
-			If thisE.CategoryID > 0 Then QueryStr &= String.Format(", CategoryID = {0}", thisE.CategoryID.ToString())
-			If thisE.UserID > 0 Then QueryStr &= String.Format(", UserID = {0}", thisE.UserID.ToString())
-			If thisE.UserType <> Nothing AndAlso thisE.UserType <> Enumerations.UserType.Unknown Then QueryStr &= String.Format(", UserTYpe = {0}", thisE.UserType.ToString())
-			If thisE.CreatedDate <> CDate("1/1/2000") Then QueryStr &= String.Format(", CreatedDate = '{0}'", thisE.CreatedDate.ToString())
-			If thisE.Image IsNot Nothing AndAlso thisE.Image.Length > 0 Then QueryStr &= String.Format(", Image = {0}", System.Text.Encoding.UTF8.GetString(thisE.Image))
-			If thisE.Status <> Enumerations.EntryStatus.Unknown Then QueryStr &= String.Format(", [Status] = {0}", CType(thisE.Status, Integer).ToString())
+
+			If Not String.IsNullOrEmpty(thisE.Description) Then QueryStr &= "[Description] = @Description"
+			If thisE.Amount > 0.0 Then QueryStr &= ", Amount = @Amount"
+			If thisE.EntryType <> Enumerations.EntryType.Unknown Then QueryStr &= ", EntryType = @EntryType"
+			If Not String.IsNullOrEmpty(thisE.Notes) Then QueryStr &= ", Notes = @Notes"
+			If thisE.LocationID > 0 Then QueryStr &= ", LocationID = @LocationID"
+			If thisE.CategoryID > 0 Then QueryStr &= ", CategoryID = @CategoryID"
+			If thisE.UserID > 0 Then QueryStr &= ", UserID = @UserID"
+			If thisE.UserType <> Nothing AndAlso thisE.UserType <> Enumerations.UserType.Unknown Then QueryStr &= ", UserType = @UserType"
+			If thisE.CreatedDate <> CDate("1/1/2000") Then QueryStr &= ", CreatedDate = @CreatedDate"
+			If thisE.Image IsNot Nothing AndAlso thisE.Image.Length > 0 Then QueryStr &= ", Image = @Image"
+			If thisE.Status <> Enumerations.EntryStatus.Unknown Then QueryStr &= ", [Status] = @Status"
+
 			QueryStr &= " WHERE EntryID = " & thisE.EntryID
 			Using conn As New SqlConnection(ConnStr)
-				Dim sqltext As String = String.Format("UPDATE Entries SET {0}", QueryStr)
-				Using command As New SqlCommand(sqltext, conn)
+				Using command As New SqlCommand(QueryStr, conn)
+					command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 200))
+					command.Parameters.Add(New SqlParameter("@Amount", SqlDbType.Decimal))
+					command.Parameters.Add(New SqlParameter("@EntryType", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@Notes", SqlDbType.VarChar, 2000))
+					command.Parameters.Add(New SqlParameter("@LocationID", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@CategoryID", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@UserID", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@UserType", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@CreatedDate", SqlDbType.DateTime))
+					command.Parameters.Add(New SqlParameter("@Image", SqlDbType.Image))
+					command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
+
+					If Not String.IsNullOrEmpty(thisE.Description) Then command.Parameters("@Description").Value = thisE.Description Else command.Parameters("@Description").Value = ""
+					If thisE.Amount > 0.0 Then command.Parameters("@Amount").Value = thisE.Amount Else command.Parameters("@Amount").Value = 0.0
+					If thisE.EntryType <> Enumerations.EntryType.Unknown Then command.Parameters("@EntryType").Value = CType(thisE.EntryType, Integer) Else command.Parameters("@EntryType").Value = -1
+					If Not String.IsNullOrEmpty(thisE.Notes) Then command.Parameters("@Notes").Value = thisE.Notes Else command.Parameters("@Notes").Value = ""
+					If thisE.LocationID > 0 Then command.Parameters("@LocationID").Value = thisE.LocationID Else command.Parameters("@LocationID").Value = 0
+					If thisE.CategoryID > 0 Then command.Parameters("@CategoryID").Value = thisE.CategoryID Else command.Parameters("@CategoryID").Value = 0
+					If thisE.UserID > 0 Then command.Parameters("@UserID").Value = thisE.UserID Else command.Parameters("@UserID").Value = 0
+					If thisE.UserType <> Nothing AndAlso thisE.UserType <> Enumerations.UserType.Unknown Then command.Parameters("@UserType").Value = thisE.UserType Else command.Parameters("@UserType").Value = -1
+					If thisE.CreatedDate <> CDate("1/1/2000") Then command.Parameters("@CreatedDate").Value = thisE.CreatedDate Else command.Parameters("@CreatedDate").Value = CDate("01/01/2000")
+					If thisE.Image IsNot Nothing AndAlso thisE.Image.Length > 0 Then command.Parameters("@Image").Value = thisE.Image Else command.Parameters("@Image").Value = New Byte() {}
+					If thisE.Status <> Enumerations.EntryStatus.Unknown Then command.Parameters("@Status").Value = thisE.Status Else command.Parameters("@Status").Value = -1
+
 					command.CommandType = System.Data.CommandType.Text
 					conn.Open()
 					command.ExecuteNonQuery()
@@ -451,22 +515,34 @@ Friend Class SQL
 			End Using
 		Else
 			' Create a new Entry '
-			QueryStr &= "Amount, EntryType, UserID, UserType, [Description], Notes, LocationID, CategoryID, Image, CreatedDate, [Status]"
-			Dim Query2 As String = ""
-			If thisE.Amount > 0.0 Then Query2 &= thisE.Amount & ", " Else Query2 &= "0"
-			If thisE.EntryType <> Nothing AndAlso thisE.EntryType <> Enumerations.EntryType.Unknown Then Query2 &= thisE.EntryType.ToString() & ", " Else Query2 &= "NULL, "
-			If thisE.UserID > 0 Then Query2 &= thisE.UserID & ", " Else Query2 &= "NULL, "
-			If thisE.UserType <> Nothing AndAlso thisE.UserType <> Enumerations.UserType.Unknown Then Query2 &= thisE.UserType.ToString() & ", " Else Query2 &= "NULL, "
-			If Not String.IsNullOrEmpty(thisE.Description) Then Query2 &= "'" & thisE.Description & "', " Else Query2 &= "NULL, "
-			If Not String.IsNullOrEmpty(thisE.Notes) Then Query2 &= "'" & thisE.Notes & "', " Else Query2 &= "NULL, "
-			If thisE.LocationID > 0 Then Query2 &= thisE.LocationID & ", " Else Query2 &= "NULL, "
-			If thisE.CategoryID > 0 Then Query2 &= thisE.CategoryID & ", " Else Query2 &= "NULL, "
-			If thisE.Image IsNot Nothing AndAlso thisE.Image.Length > 0 Then Query2 &= System.Text.Encoding.UTF8.GetString(thisE.Image) & ", " Else Query2 &= "NULL, "
-			If thisE.CreatedDate <> Nothing AndAlso thisE.CreatedDate <> CDate("01/01/2000") Then Query2 &= "'" & thisE.CreatedDate.ToString() & "', " Else Query2 &= "NULL, "
-			If thisE.Status <> Nothing AndAlso thisE.Status <> Enumerations.EntryStatus.Unknown Then Query2 &= CType(thisE.Status, Integer).ToString() Else Query2 &= "NULL"
+			QueryStr = "INSERT INTO Entries (Amount, EntryType, UserID, UserType, [Description], Notes, LocationID, CategoryID, Image, CreatedDate, [Status]) VALUES (@Amount, @EntryType, @UserID, @UserType, @Description, @Notes, @LocationID, @CategoryID, @Image, @CreatedDate, @Status);"
 
 			Using conn As New SqlConnection(ConnStr)
-				Using command As New SqlCommand(String.Format("INSERT INTO Entries ({0}) VALUES ({1});", QueryStr, Query2), conn)
+				Using command As New SqlCommand(QueryStr, conn)
+					command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 200))
+					command.Parameters.Add(New SqlParameter("@Amount", SqlDbType.Decimal))
+					command.Parameters.Add(New SqlParameter("@EntryType", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@Notes", SqlDbType.VarChar, 2000))
+					command.Parameters.Add(New SqlParameter("@LocationID", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@CategoryID", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@UserID", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@UserType", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@CreatedDate", SqlDbType.DateTime))
+					command.Parameters.Add(New SqlParameter("@Image", SqlDbType.Image))
+					command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
+
+					If thisE.Amount > 0.0 Then command.Parameters("@Amount").Value = thisE.Amount Else command.Parameters("@Amount").Value = 0.0
+					If thisE.EntryType <> Nothing AndAlso thisE.EntryType <> Enumerations.EntryType.Unknown Then command.Parameters("@EntryType").Value = CType(thisE.EntryType, Integer) Else command.Parameters("@EntryType").Value = -1
+					If thisE.UserID > 0 Then command.Parameters("@UserID").Value = thisE.UserID Else command.Parameters("@UserID").Value = 0
+					If thisE.UserType <> Nothing AndAlso thisE.UserType <> Enumerations.UserType.Unknown Then command.Parameters("@UserType").Value = thisE.UserType Else command.Parameters("@UserType").Value = -1
+					If Not String.IsNullOrEmpty(thisE.Description) Then command.Parameters("@Description").Value = thisE.Description Else command.Parameters("@Description").Value = ""
+					If Not String.IsNullOrEmpty(thisE.Notes) Then command.Parameters("@Notes").Value = thisE.Notes Else command.Parameters("@Notes").Value = ""
+					If thisE.LocationID > 0 Then command.Parameters("@LocationID").Value = thisE.LocationID Else command.Parameters("@LocationID").Value = 0
+					If thisE.CategoryID > 0 Then command.Parameters("@CategoryID").Value = thisE.CategoryID Else command.Parameters("@CategoryID").Value = 0
+					If thisE.Image IsNot Nothing AndAlso thisE.Image.Length > 0 Then command.Parameters("@Image").Value = thisE.Image Else command.Parameters("@Image").Value = New Byte() {}
+					If thisE.CreatedDate <> Nothing AndAlso thisE.CreatedDate <> CDate("01/01/2000") Then command.Parameters("@CreatedDate").Value = thisE.CreatedDate Else command.Parameters("@CreatedDate").Value = CDate("01/01/2000")
+					If thisE.Status <> Nothing AndAlso thisE.Status <> Enumerations.EntryStatus.Unknown Then command.Parameters("@Status").Value = thisE.Status Else command.Parameters("@Status").Value = -1
+
 					command.CommandType = System.Data.CommandType.Text
 					conn.Open()
 					Dim RowsAffected As Integer = 0
@@ -490,14 +566,14 @@ Friend Class SQL
 	Private Sub HydrateEntry(ByRef obj As Entry, ByVal r As System.Data.SqlClient.SqlDataReader)
 
 		If Not IsDBNull(r("EntryID")) Then obj.SetID(r("EntryID"))
-		If Not IsDBNull(r("Status")) Then obj.Status = r("[Status]")
+		If Not IsDBNull(r("Status")) Then obj.Status = r("Status")
 		If Not IsDBNull(r("EntryType")) Then obj.EntryType = r("EntryType")
 		If Not IsDBNull(r("Image")) AndAlso r("Image").Length > 0 Then obj.Image = r("Image")
 		If Not IsDBNull(r("CreatedDate")) AndAlso Not String.IsNullOrEmpty(r("CreatedDate")) Then obj.SetCreatedDate(CDate(r("CreatedDate")))
 		If Not IsDBNull(r("Amount")) Then obj.Amount = r("Amount")
 		If Not IsDBNull(r("UserID")) Then obj.UserID = r("UserID")
 		If Not IsDBNull(r("UserType")) Then obj.UserID = r("UserType")
-		If Not IsDBNull(r("Description")) Then obj.Description = r("[Description]")
+		If Not IsDBNull(r("Description")) Then obj.Description = r("Description")
 		If Not IsDBNull(r("Notes")) Then obj.Notes = r("Notes")
 		If Not IsDBNull(r("LocationID")) Then obj.LocationID = r("LocationID")
 		If Not IsDBNull(r("CategoryID")) Then obj.CategoryID = r("CategoryID")
@@ -608,7 +684,6 @@ Friend Class SQL
 
     Friend Function SaveObject_Location(ByVal thisL As Location) As Long
 		Dim QueryStr As String = "UPDATE Locations SET "
-		Dim Query2 As String = ""
 
 		If thisL.LocationID > 0 OrElse thisL.SaveID > 0 Then
 			If thisL.LocationID = 0 Then thisL.LocationID = thisL.SaveID
@@ -658,13 +733,10 @@ Friend Class SQL
 			End Using
 		Else
 			' Create a new Location '
-			QueryStr = "LocationType, Name, [Description], URL, Image, [Status]"
-			Query2 = "@LocationType, @Name, @Description, @URL, @Image, @Status"
+			QueryStr = "INSERT INTO Locations (LocationType, Name, [Description], URL, Image, [Status]) VALUES (@LocationType, @Name, @Description, @URL, @Image, @Status);"
 
 			Using conn As New SqlConnection(ConnStr)
-				Dim sqltext As String = String.Format("INSERT INTO Locations ({0}) VALUES ({1});", QueryStr, Query2)
-				Using command As New SqlCommand(sqltext, conn)
-
+				Using command As New SqlCommand(QueryStr, conn)
 					command.Parameters.Add(New SqlParameter("@LocationType", SqlDbType.Int))
 					command.Parameters("@LocationType").Value = IIf(thisL.LocationType <> Nothing AndAlso thisL.LocationType <> Enumerations.LocationType.Unknown, CType(thisL.LocationType, Integer), CType(Enumerations.LocationType.Unknown, Integer))
 					command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
@@ -809,7 +881,6 @@ Friend Class SQL
 
 	Friend Function SaveObject_Category(ByVal thisC As Category) As Long
 		Dim QueryStr As String = "UPDATE Categories SET "
-		Dim Query2 As String = ""
 
 		If thisC.CategoryID > 0 OrElse thisC.SaveID > 0 Then
 			If thisC.CategoryID = 0 Then thisC.CategoryID = thisC.SaveID
@@ -841,33 +912,17 @@ Friend Class SQL
 			End Using
 		Else
 			' Create a new Category '
-			QueryStr = "Name, [Description], [Status]"
-			Query2 = "@Name, @Description, @Status"
+			QueryStr = "INSERT INTO Categories (Name, [Description], [Status]) VALUES (@Name, @Description, @Status);"
 
 			Using conn As New SqlConnection(ConnStr)
-				Using command As New SqlCommand(String.Format("INSERT INTO Categories ({0}) VALUES ({1});", QueryStr, Query2), conn)
+				Using command As New SqlCommand(QueryStr, conn)
+					command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
+					command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 2000))
+					command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
 
-					If Not String.IsNullOrEmpty(thisC.Name) Then
-						command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
-						command.Parameters("@Name").Value = thisC.Name
-					Else
-						command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
-						command.Parameters("@Name").Value = ""
-					End If
-					If Not String.IsNullOrEmpty(thisC.Description) Then
-						command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 2000))
-						command.Parameters("@Description").Value = thisC.Description
-					Else
-						command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 2000))
-						command.Parameters("@Description").Value = ""
-					End If
-					If thisC.Status <> Nothing AndAlso thisC.Status <> Enumerations.CategoryStatus.Unknown Then
-						command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
-						command.Parameters("@Status").Value = thisC.Status
-					Else
-						command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
-						command.Parameters("@Status").Value = -1
-					End If
+					If Not String.IsNullOrEmpty(thisC.Name) Then command.Parameters("@Name").Value = thisC.Name Else command.Parameters("@Name").Value = ""
+					If Not String.IsNullOrEmpty(thisC.Description) Then command.Parameters("@Description").Value = thisC.Description Else command.Parameters("@Description").Value = ""
+					If thisC.Status <> Nothing AndAlso thisC.Status <> Enumerations.CategoryStatus.Unknown Then command.Parameters("@Status").Value = thisC.Status Else command.Parameters("@Status").Value = -1
 
 					command.CommandType = System.Data.CommandType.Text
 					conn.Open()

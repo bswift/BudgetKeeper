@@ -45,7 +45,7 @@
                 enc.Key = m_Key
                 If obj.UserID = 0 AndAlso obj.SaveID = 0 Then
                     obj.SetCreatedDate(DateTime.Now)
-                    obj.SetLastLogin(DateTime.Now)
+					obj.SetLastLogin(CDate("01/01/2000"))
                 End If
                 If Not String.IsNullOrEmpty(obj.Password) Then
                     obj.Password = enc.EncryptString(obj.Password)

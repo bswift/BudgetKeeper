@@ -21,8 +21,8 @@ Public Class frm_OM_Test
             'UserCol.Filter.CreatedDateFrom = CDate("08/06/2014")
             'UserCol.Populate()
 
-			'Dim newguy As New Objects.User With {.FullName = "Ben Swift", .Email = "ben.swift@live.com", .Phone = "5749716611", .Status = Enumerations.UserStatus.Active, .Username = "bswift", .UserType = Enumerations.UserType.Admin, .Password = "password", .Parent = conn}
-			'Dim SaveID As Long = newguy.Save()
+			Dim newguy As New Objects.User With {.FullName = "Dersh McGersh", .Email = "dersh@mcgersh.com", .Phone = "5745556611", .Status = Enumerations.UserStatus.Active, .Username = "dmcgersh", .UserType = Enumerations.UserType.Viewer, .Password = "password", .Parent = conn}
+			Dim SaveID As Long = newguy.Save()
 
 			'Dim newLocation As New Objects.Location() With {.Description = "My wife's favorite place to shop.", .LocationType = Enumerations.LocationType.Generic, .Name = "Target", .Status = Enumerations.LocationStatus.Active, .URL = "http://target.com", .Parent = conn}
 			'Dim SaveID As Long = newLocation.Save()
@@ -37,9 +37,9 @@ Public Class frm_OM_Test
 			'Dim newCat As New Objects.Category With {.Description = "idk", .Name = "Food", .Parent = conn, .Status = Enumerations.CategoryStatus.Active}
 			'Dim SaveID As Long = newCat.Save()
 
-			Dim cat As Objects.Category = CType(conn.GetBase(1, Enumerations.ObjectType.Category), Objects.Category)
-			cat.Description = "huzzah!"
-			Dim SaveID As Long = cat.Save()
+			'Dim cat As Objects.Category = CType(conn.GetBase(1, Enumerations.ObjectType.Category), Objects.Category)
+			'cat.Description = "huzzah!"
+			'Dim SaveID As Long = cat.Save()
 
 			Dim a As String = ""
         Catch ex As Exception
