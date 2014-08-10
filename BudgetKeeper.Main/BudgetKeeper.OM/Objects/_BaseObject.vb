@@ -334,7 +334,6 @@
             If m_Filter.CountOnly Then
                 m_ListCount = c.GetCollectionCount(Me)
             Else
-                Me.ExtraProperties("derp") = True
                 c.GetBaseCollection(Me)
 
                 m_ListCount = m_ThisList.Count

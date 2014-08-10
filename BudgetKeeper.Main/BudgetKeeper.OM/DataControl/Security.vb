@@ -343,7 +343,6 @@
 #Region "Get Collection"
 
     Friend Sub GetSecureCollection(ByRef InColl As Objects._BaseCollection)
-        Dim cleanEntity As Boolean = False ' preserves integrity of linq object in the case of inheritance
         Try
             Select Case InColl.ObjectType
                 Case Enumerations.ObjectType.User
@@ -396,12 +395,11 @@
             Dim ecoll As Objects.EntryCollection = m_SQL.GetCollection_Entry(InEntryColl.m_Filter)
             If ecoll Is Nothing Then
                 Throw New Exception(String.Format("An unexpected problem occurred during Entry fill."))
-            End If
+			End If
 
-            For Each e As Objects.Entry In ecoll
-                Dim tempE As New Objects.Entry
-                InEntryColl.Add(tempE)
-            Next
+			For Each e As Objects.Entry In ecoll
+				InEntryColl.Add(e)
+			Next
         End If
 
         Return InEntryColl.Count
@@ -418,12 +416,11 @@
             Dim lcoll As Objects.LocationCollection = m_SQL.GetCollection_Location(InLocationColl.m_Filter)
             If lcoll Is Nothing Then
                 Throw New Exception(String.Format("An unexpected problem occurred during Location fill."))
-            End If
+			End If
 
-            For Each l As Objects.Location In lcoll
-                Dim tempL As New Objects.Location
-                InLocationColl.Add(tempL)
-            Next
+			For Each l As Objects.Location In lcoll
+				InLocationColl.Add(l)
+			Next
         End If
 
         Return InLocationColl.Count
@@ -442,10 +439,10 @@
                 Throw New Exception(String.Format("An unexpected problem occurred during Category fill."))
             End If
 
-            For Each c As Objects.Category In ccoll
-                Dim tempC As New Objects.Category
-                InCategoryColl.Add(tempC)
-            Next
+			For Each c As Objects.Category In ccoll
+				InCategoryColl.Add(c)
+			Next
+
         End If
 
         Return InCategoryColl.Count
