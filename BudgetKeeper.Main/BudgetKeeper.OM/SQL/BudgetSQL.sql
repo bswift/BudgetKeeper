@@ -32,7 +32,7 @@ GO
 
 IF NOT EXISTS(SELECT * FROM sys.objects WHERE OBJECT_ID = OBJECT_ID(N'[dbo].[Entries]') AND TYPE in (N'U'))
 CREATE TABLE [dbo].[Entries](
-	[EntryID] [int] IDENTITY(1,1) NOT NULL,
+	[EntryID] [bigint] IDENTITY(1,1) NOT NULL,
 	[Amount] [int] NULL,
 	[EntryType] [int] NULL,
 	[UserID] [int] NULL,

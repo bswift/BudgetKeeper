@@ -12,17 +12,21 @@ Public Class frm_OM_Test
             'hello.Password = "password"
 			'Dim userid As Long = hello.Save()
 
-            'Dim UserCol As New Objects.UserCollection()
-            'UserCol.Parent = conn
-            'UserCol.Filter.Email = "ben.swift@live.com"
-            'UserCol.Filter.Name = "Ben Swift"
-            'UserCol.Filter.Username = "bswift"
-            'UserCol.Filter.CreatedDateFrom = CDate("08/06/2014")
-            'UserCol.Filter.CreatedDateFrom = CDate("08/06/2014")
-            'UserCol.Populate()
+			Dim UserCol As New Objects.UserCollection()
+			UserCol.Parent = conn
+			'UserCol.Filter.Email = "ben.swift@live.com"
+			UserCol.Filter.Name = "Ben Sw"
+			'UserCol.Filter.CreatedDateFrom = CDate("08/06/2014")
+			'UserCol.Filter.HasImage = True
+			UserCol.Populate()
 
-			Dim newguy As New Objects.User With {.FullName = "Dersh McGersh", .Email = "dersh@mcgersh.com", .Phone = "5745556611", .Status = Enumerations.UserStatus.Active, .Username = "dmcgersh", .UserType = Enumerations.UserType.Viewer, .Password = "password", .Parent = conn}
-			Dim SaveID As Long = newguy.Save()
+			Dim count As Long = UserCol.Count
+
+			'Dim newguy As New Objects.User With {.FullName = "Ben Swift", .Email = "ben.swift@live.com", .Phone = "5749716611", .Status = Enumerations.UserStatus.Active, .Username = "bswift", .UserType = Enumerations.UserType.Admin, .Password = "password", .Parent = conn}
+			'Dim SaveID As Long = newguy.Save()
+
+			'newguy = New Objects.User With {.FullName = "Dersh McGersh", .Email = "dersh@mcgersh.com", .Phone = "5745556611", .Status = Enumerations.UserStatus.Active, .Username = "dmcgersh", .UserType = Enumerations.UserType.Viewer, .Password = "password", .Parent = conn}
+			'SaveID = newguy.Save()
 
 			'Dim newLocation As New Objects.Location() With {.Description = "My wife's favorite place to shop.", .LocationType = Enumerations.LocationType.Generic, .Name = "Target", .Status = Enumerations.LocationStatus.Active, .URL = "http://target.com", .Parent = conn}
 			'Dim SaveID As Long = newLocation.Save()

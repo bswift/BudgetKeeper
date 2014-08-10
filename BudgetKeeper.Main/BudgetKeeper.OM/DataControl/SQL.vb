@@ -30,8 +30,9 @@ Friend Class SQL
                         If Not IsDBNull(reader("Name")) AndAlso Not String.IsNullOrEmpty(reader("Name")) Then newUser.FullName = reader("Name")
                         If Not IsDBNull(reader("Email")) AndAlso Not String.IsNullOrEmpty(reader("Email")) Then newUser.Email = reader("Email")
                         If Not IsDBNull(reader("Phone")) AndAlso Not String.IsNullOrEmpty(reader("Phone")) Then newUser.Phone = reader("Phone")
-                        If Not IsDBNull(reader("CreatedDate")) AndAlso Not String.IsNullOrEmpty(reader("CreatedDate")) Then newUser.SetCreatedDate(CDate(reader("CreatedDate")))
-                        If Not IsDBNull(reader("LastLogin")) AndAlso Not String.IsNullOrEmpty(reader("LastLogin")) Then newUser.SetLastLogin(CDate(reader("LastLogin")))
+						If Not IsDBNull(reader("CreatedDate")) Then newUser.SetCreatedDate(reader("CreatedDate"))
+						If Not IsDBNull(reader("LastLogin")) Then newUser.SetLastLogin(reader("LastLogin"))
+						If Not IsDBNull(reader("Image")) AndAlso reader("Image").Length > 0 Then newUser.Image = reader("Image")
 
                         uColl.Add(newUser)
                     End While
@@ -78,64 +79,6 @@ Friend Class SQL
 
 #End Region
 
-#Region "Other"
-
-    Private Shared Function PopulateProperties(obj As Object, r As SqlDataReader) As Object
-        Dim t As Type = obj.GetType()
-        Dim PropInfo() As System.Reflection.PropertyInfo = t.GetProperties()
-
-        For Each p As System.Reflection.PropertyInfo In PropInfo
-            Try
-                If p.PropertyType.ToString.Contains(GetType(Byte()).ToString) Then
-                    If r.GetOrdinal(p.Name) > 0 Then
-                        If Not IsDBNull(r(p.Name)) Then
-                            Dim val As Byte() = CType(r(p.Name), Byte())
-                            p.SetValue(obj, val, Nothing)
-                        Else
-                            p.SetValue(obj, "", Nothing)
-                        End If
-                    End If
-                ElseIf p.PropertyType.ToString.Contains(GetType(String).ToString) Then
-                    Dim skip As Boolean = False
-                    Dim temp As String = p.Name
-                    If p.Name = "FullName" Then
-                        temp = "Name"
-                    End If
-                    If p.Name = "LastName" OrElse p.Name = "FirstName" Then
-                        skip = True
-                    End If
-                    If Not skip Then
-                        Dim val As String = r(temp).ToString
-                        p.SetValue(obj, val)
-                    End If
-                ElseIf p.PropertyType.ToString.Contains(GetType(Int64).ToString) Then
-                    Dim val As Int64 = CInt(r(p.Name))
-                    p.SetValue(obj, val)
-                ElseIf p.PropertyType.ToString.Contains(GetType(Int32).ToString) Then
-                    Dim val As Int32 = CInt(r(p.Name))
-                    p.SetValue(obj, val, Nothing)
-                ElseIf p.PropertyType.ToString().Contains(GetType(Int16).ToString) Then
-                    Dim val As Int16 = CInt(r(p.Name))
-                    p.SetValue(obj, val, Nothing)
-                ElseIf p.PropertyType.ToString.Contains(GetType(DateTime).ToString) Then
-                    Dim val As DateTime = CDate(r(p.Name))
-                    If p.Name = "CreatedDate" Then obj.SetCreatedDate(val)
-                    If p.Name = "LastLogin" Then obj.SetLastLogin(val)
-                    p.SetValue(obj, val, Nothing)
-                ElseIf p.PropertyType.ToString.Contains(GetType(Byte).ToString) Then
-                    Dim val As Byte = CByte(r(p.Name))
-                    p.SetValue(obj, val, Nothing)
-                End If
-            Catch ex As Exception
-                Dim a As String = "a"
-            End Try
-        Next
-
-        Return obj
-    End Function
-
-#End Region
-
 #Region "User"
 
     Friend Function GetObject_User(ByVal UserID As Long) As Objects.User
@@ -143,17 +86,19 @@ Friend Class SQL
         Dim usrLst As New Objects.UserCollection
 
         Using conn As New SqlConnection(ConnStr)
-            Using command As New SqlCommand(String.Format("SELECT * FROM dbo.Users WHERE UserID = '{0}'", UserID), conn)
-                command.CommandType = System.Data.CommandType.Text
-                conn.Open()
-                Using reader = command.ExecuteReader()
-                    While reader.Read
-                        Dim newUser = New User()
-                        HydrateUser(newUser, reader)
-                        usrLst.Add(newUser)
-                    End While
-                End Using
-            End Using
+			Using command As New SqlCommand("SELECT * FROM dbo.Users WHERE UserID = @UserID", conn)
+				command.Parameters.Add(New SqlParameter("@UserID", SqlDbType.Int))
+				command.Parameters("@UserID").Value = UserID
+				command.CommandType = System.Data.CommandType.Text
+				conn.Open()
+				Using reader = command.ExecuteReader()
+					While reader.Read
+						Dim newUser = New User()
+						HydrateUser(newUser, reader)
+						usrLst.Add(newUser)
+					End While
+				End Using
+			End Using
         End Using
 
         If usrLst.Count > 1 Then
@@ -191,50 +136,93 @@ Friend Class SQL
             Next
             FilterStr &= String.Format(")")
         End If
-        If Not String.IsNullOrEmpty(Filter.Username) Then FilterStr &= " AND (Username = '" & Filter.Username & "')"
-        If Not String.IsNullOrEmpty(Filter.Phone) Then FilterStr &= " AND (Phone = '" & Filter.Phone & "')"
-        If Not String.IsNullOrEmpty(Filter.Email) Then FilterStr &= " AND (Email = '" & Filter.Email & "')"
-        If Not String.IsNullOrEmpty(Filter.Name) Then FilterStr &= " AND (Name = '" & Filter.Name & "')"
-        If Filter.CreatedDateFrom > CDate("1/1/2000") Then FilterStr &= String.Format(" AND (CreatedDate >= '{0}')", Filter.CreatedDateFrom)
-        If Filter.CreatedDateTo > CDate("1/1/2000") Then FilterStr &= String.Format(" AND (CreatedDate <= '{0}')", Filter.CreatedDateTo)
-        If Filter.LastLoginFrom > CDate("1/1/2000") Then FilterStr &= String.Format(" AND (LastLogin >= '{0}')", Filter.LastLoginFrom)
-        If Filter.LastLoginTo > CDate("1/1/2000") Then FilterStr &= String.Format(" AND (LastLogin <= '{0}')", Filter.LastLoginTo)
-        If Filter.RangeLength > 0 Then FilterStr &= String.Format(" AND (RowNum <= {0} AND RowNum > {1})", Filter.RangeLength + Filter.RangeBegin, Filter.RangeBegin)
-        If Not String.IsNullOrEmpty(Filter.Sort) Then FilterStr &= String.Format(" ORDER BY {0}", Filter.Sort)
+		If Not String.IsNullOrEmpty(Filter.Username) Then FilterStr &= " AND (Username LIKE @Username)"
+		If Not String.IsNullOrEmpty(Filter.Phone) Then FilterStr &= " AND (Phone = @Phone)"
+		If Not String.IsNullOrEmpty(Filter.Email) Then FilterStr &= " AND (Email = @Email)"
+		If Not String.IsNullOrEmpty(Filter.Name) Then FilterStr &= " AND (Name LIKE @Name)"
+		If Filter.CreatedDateFrom > CDate("1/1/2000") Then FilterStr &= " AND (CreatedDate >= @CreatedDateFrom)"
+		If Filter.CreatedDateTo > CDate("1/1/2000") Then FilterStr &= " AND (CreatedDate <= @CreatedDateTo)"
+		If Filter.LastLoginFrom > CDate("1/1/2000") Then FilterStr &= " AND (LastLogin >= @LastLoginFrom)"
+		If Filter.LastLoginTo > CDate("1/1/2000") Then FilterStr &= " AND (LastLogin <= @LastLoginTo)"
+		If Filter.RangeLength > 0 Then FilterStr &= " AND (RowNum <= @RangeLength AND RowNum > @RangeBegin)"
+		If Filter.HasImage Then FilterStr &= " AND (DATALENGTH([Image]) > 0)"
+		If Not String.IsNullOrEmpty(Filter.Sort) Then FilterStr &= " ORDER BY @Sort"
 
-        If Filter.CountOnly Then
-			Using conn As New SqlConnection(ConnStr)
-				Dim sqltext As String = String.Format("SELECT COUNT(UserID) AS 'Count' FROM Users WHERE 1 = 1{0}", FilterStr)
-				Using command As New SqlCommand(sqltext, conn)
-					command.CommandType = System.Data.CommandType.Text
-					conn.Open()
-					Using reader = command.ExecuteReader()
-						While reader.Read
+		Dim sqltext As String = ""
+		If Filter.CountOnly Then
+			sqltext = String.Format("SELECT COUNT(UserID) AS 'Count' FROM Users WHERE 1 = 1{0}", FilterStr)
+		Else
+			sqltext = String.Format("SELECT rank() OVER (ORDER BY UserID) as 'RowNum',* FROM Users WHERE 1 = 1{0}", FilterStr)
+		End If
+
+		Using conn As New SqlConnection(ConnStr)
+			Using command As New SqlCommand(sqltext, conn)
+				If Not String.IsNullOrEmpty(Filter.Username) Then
+					command.Parameters.Add(New SqlParameter("@Username", SqlDbType.VarChar, 100))
+					command.Parameters("@Username").Value = Filter.Username
+				End If
+				If Not String.IsNullOrEmpty(Filter.Phone) Then
+					command.Parameters.Add(New SqlParameter("@Phone", SqlDbType.VarChar, 10))
+					command.Parameters("@Phone").Value = Filter.Phone
+				End If
+				If Not String.IsNullOrEmpty(Filter.Email) Then
+					command.Parameters.Add(New SqlParameter("@Email", SqlDbType.VarChar, 100))
+					command.Parameters("@Email").Value = Filter.Email
+				End If
+				If Not String.IsNullOrEmpty(Filter.Name) Then
+					command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
+					command.Parameters("@Name").Value = "%" & Filter.Name & "%"
+				End If
+				If Filter.CreatedDateFrom > CDate("1/1/2000") Then
+					command.Parameters.Add(New SqlParameter("@CreatedDateFrom", SqlDbType.DateTime))
+					command.Parameters("@CreatedDateFrom").Value = Filter.CreatedDateFrom
+				End If
+				If Filter.CreatedDateTo > CDate("1/1/2000") Then
+					command.Parameters.Add(New SqlParameter("@CreatedDateTo", SqlDbType.DateTime))
+					command.Parameters("@CreatedDateTo").Value = Filter.CreatedDateTo
+				End If
+				If Filter.LastLoginFrom > CDate("1/1/2000") Then
+					command.Parameters.Add(New SqlParameter("@LastLoginFrom", SqlDbType.DateTime))
+					command.Parameters("@LastLoginFrom").Value = Filter.LastLoginFrom
+				End If
+				If Filter.LastLoginTo > CDate("1/1/2000") Then
+					command.Parameters.Add(New SqlParameter("@LastLoginTo", SqlDbType.DateTime))
+					command.Parameters("@LastLoginTo").Value = Filter.LastLoginTo
+				End If
+				If Filter.RangeLength > 0 Then
+					command.Parameters.Add(New SqlParameter("@RangeLength", SqlDbType.Int))
+					command.Parameters("@RangeLength").Value = Filter.RangeLength
+				End If
+				If Filter.RangeBegin > 0 Then
+					command.Parameters.Add(New SqlParameter("@RangeBegin", SqlDbType.Int))
+					command.Parameters("@RangeBegin").Value = Filter.RangeBegin
+				End If
+				If Not String.IsNullOrEmpty(Filter.Sort) Then
+					command.Parameters.Add(New SqlParameter("@Sort", SqlDbType.VarChar, 50))
+					command.Parameters("@Sort").Value = Filter.Sort
+				End If
+
+				command.CommandType = System.Data.CommandType.Text
+				conn.Open()
+				Using reader = command.ExecuteReader()
+					While reader.Read
+						If Filter.CountOnly Then
 							If Not IsDBNull(reader("Count")) Then ThisCount = reader("Count")
-						End While
-					End Using
+						Else
+							obj = New Objects.User
+							HydrateUser(obj, reader)
+							uColl.Add(obj)
+						End If
+					End While
 				End Using
 			End Using
-            Return Nothing
-        Else
-            Using conn As New SqlConnection(ConnStr)
-                Dim sqltext As String = String.Format("SELECT rank() OVER (ORDER BY UserID) as 'RowNum',* FROM Users WHERE 1 = 1{0}", FilterStr)
-                Using command As New SqlCommand(sqltext, conn)
-                    command.CommandType = System.Data.CommandType.Text
-                    conn.Open()
-                    Using reader As System.Data.SqlClient.SqlDataReader = command.ExecuteReader()
-                        While reader.Read
-                            obj = New Objects.User
-                            HydrateUser(obj, reader)
-                            uColl.Add(obj)
-                        End While
-                    End Using
-                End Using
-            End Using
-        End If
-
-        Return uColl
-    End Function
+		End Using
+		If Filter.CountOnly Then
+			Return Nothing
+		Else
+			Return uColl
+		End If
+	End Function
 
     Friend Function SaveObject_User(ByVal thisU As User) As Long
 		Dim QueryStr As String = ""
@@ -362,7 +350,9 @@ Friend Class SQL
 		Dim entLst As New Objects.EntryCollection
 
 		Using conn As New SqlConnection(ConnStr)
-			Using command As New SqlCommand(String.Format("SELECT * FROM Entries WHERE EntryID = '{0}'", EntryID), conn)
+			Using command As New SqlCommand("SELECT * FROM Entries WHERE EntryID = @EntryID", conn)
+				command.Parameters.Add(New SqlParameter("@EntryID", SqlDbType.BigInt))
+				command.Parameters("@EntryID").Value = EntryID
 				command.CommandType = System.Data.CommandType.Text
 				conn.Open()
 				Using reader = command.ExecuteReader()

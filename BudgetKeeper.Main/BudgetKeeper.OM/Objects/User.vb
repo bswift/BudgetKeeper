@@ -342,6 +342,17 @@
 			End Set
 		End Property
 
+		Private m_HasImage As Boolean = False
+		Public Property HasImage As Boolean
+			Get
+				Return m_HasImage
+			End Get
+			Set(value As Boolean)
+				m_HasImage = value
+			End Set
+		End Property
+
+
 		Public Sub New()
 
 		End Sub
