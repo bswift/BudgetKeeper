@@ -85,6 +85,22 @@
 		End Set
 	End Property
 
+	Private m_Budgets As Objects.BudgetCollection = Nothing
+	Public Property Budgets As Objects.BudgetCollection
+		Get
+			If m_Budgets Is Nothing Then
+				m_Budgets = New Objects.BudgetCollection
+				m_Budgets.Parent = Me
+			End If
+
+			Return m_Budgets
+		End Get
+		Set(value As Objects.BudgetCollection)
+			m_Budgets = value
+			If m_Budgets IsNot Nothing Then m_Budgets.Parent = Me
+		End Set
+	End Property
+
 #End Region
 
 #Region "Public Helper Methods"
@@ -114,6 +130,8 @@
 				inbase = New Objects.Location
 			Case Enumerations.ObjectType.Category
 				inbase = New Objects.Category
+			Case Enumerations.ObjectType.Budget
+				inbase = New Objects.Budget
 		End Select
 
 		If inbase IsNot Nothing Then

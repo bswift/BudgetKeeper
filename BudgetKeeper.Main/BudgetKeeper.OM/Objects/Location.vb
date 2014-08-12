@@ -62,7 +62,17 @@
             Set(value As String)
                 m_URL = value
             End Set
-        End Property
+		End Property
+
+		Private m_BudgetID As Integer = 0
+		Public Property BudgetID As Integer
+			Get
+				Return m_BudgetID
+			End Get
+			Set(value As Integer)
+				m_BudgetID = value
+			End Set
+		End Property
 
         Private m_Image As Byte() = Nothing
         Public Property Image As Byte()
@@ -165,6 +175,16 @@
 			End Get
 			Set(value As Integer)
 				m_LocationType = value
+			End Set
+		End Property
+
+		Private m_BudgetID As Integer = 0
+		Public Property BudgetID As Integer
+			Get
+				Return m_BudgetID
+			End Get
+			Set(value As Integer)
+				m_BudgetID = value
 			End Set
 		End Property
 

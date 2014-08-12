@@ -16,10 +16,25 @@ CREATE TABLE [dbo].[Users](
 	[LastLogin] datetime NOT NULL DEFAULT(('2000-01-01 00:00:00.000')),
 	[Image] image NULL,
 	[Status] [int] NOT NULL DEFAULT (1),
+	[BudgetIDs] [varchar](500) NULL,
  CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED 
 (
 	[UserID] ASC
 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.objects WHERE OBJECT_ID = OBJECT_ID(N'[dbo].[Budgets]') AND TYPE in (N'U'))
+CREATE TABLE [dbo].[Budgets](
+	[BudgetID] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [varchar] (100) NULL,
+	[Description] [varchar](2000) NULL,
+	[CreatedDate] DATETIME NOT NULL DEFAULT(('2000-01-01 00:00:00.000')),
+	[Status] [int] NOT NULL DEFAULT (1),
+CONSTRAINT [PK_Budgets] PRIMARY KEY CLUSTERED 
+(
+	[BudgetID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
 
@@ -29,34 +44,13 @@ BEGIN
 END 
 GO
 
-
-IF NOT EXISTS(SELECT * FROM sys.objects WHERE OBJECT_ID = OBJECT_ID(N'[dbo].[Entries]') AND TYPE in (N'U'))
-CREATE TABLE [dbo].[Entries](
-	[EntryID] [bigint] IDENTITY(1,1) NOT NULL,
-	[Amount] [int] NULL,
-	[EntryType] [int] NULL,
-	[UserID] [int] NULL,
-	[UserType] [int] NULL,
-	[Description] [varchar](200) NULL,
-	[Notes] [varchar](2000) NULL,
-	[LocationID] [int] NULL,
-	[CategoryID] [int] NULL,
-	[Image] image NULL,
-	[CreatedDate] datetime NOT NULL DEFAULT(('2000-01-01 00:00:00.000')),
-	[Status] [int] NOT NULL DEFAULT (1),
- CONSTRAINT [PK_Entry] PRIMARY KEY CLUSTERED 
-(
-	[EntryID] ASC
-)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-
 IF NOT EXISTS(SELECT * FROM sys.objects WHERE OBJECT_ID = OBJECT_ID(N'[dbo].[Categories]') AND TYPE in (N'U'))
 CREATE TABLE [dbo].[Categories](
 	[CategoryID] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [varchar] (100) NULL,
 	[Description] [varchar](2000) NULL,
 	[Status] [int] NOT NULL DEFAULT (1),
+	[BudgetID] [int] NOT NULL DEFAULT (0),
  CONSTRAINT [PK_Category] PRIMARY KEY CLUSTERED 
 (
 	[CategoryID] ASC
@@ -73,9 +67,32 @@ CREATE TABLE [dbo].[Locations](
 	[URL] [varchar] (200) NULL,
 	[Image] image NULL,
 	[Status] [int] NOT NULL DEFAULT (1),
+	[BudgetID] [int] NOT NULL DEFAULT (0),
  CONSTRAINT [PK_Location] PRIMARY KEY CLUSTERED 
 (
 	[LocationID] ASC
-)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+IF NOT EXISTS(SELECT * FROM sys.objects WHERE OBJECT_ID = OBJECT_ID(N'[dbo].[Entries]') AND TYPE in (N'U'))
+CREATE TABLE [dbo].[Entries](
+	[EntryID] [bigint] IDENTITY(1,1) NOT NULL,
+	[Amount] [int] NULL,
+	[EntryType] [int] NULL,
+	[UserID] [int] NULL,
+	[UserType] [int] NULL,
+	[Description] [varchar](200) NULL,
+	[Notes] [varchar](2000) NULL,
+	[LocationID] [int] NULL FOREIGN KEY REFERENCES Locations(LocationID),
+	[CategoryID] [int] NULL FOREIGN KEY REFERENCES Categories(CategoryID),
+	[BudgetID] [int] NULL FOREIGN KEY REFERENCES Budgets(BudgetID),
+	[Image] image NULL,
+	[CreatedDate] datetime NOT NULL DEFAULT(('2000-01-01 00:00:00.000')),
+	[Status] [int] NOT NULL DEFAULT (1),
+ CONSTRAINT [PK_Entry] PRIMARY KEY CLUSTERED 
+(
+	[EntryID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO

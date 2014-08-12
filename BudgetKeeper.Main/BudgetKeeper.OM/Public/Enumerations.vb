@@ -1,5 +1,11 @@
 ﻿Public Class Enumerations
 
+	Enum BudgetStatus
+		Unknown = -1
+		Active = 1
+		Deleted = 101
+	End Enum
+
 	Enum CategoryStatus
 		Unknown = -1
 		Active = 1
@@ -42,6 +48,7 @@
 		Entry = 2
 		Location = 3
 		Category = 4
+		Budget = 5
 	End Enum
 
 	Enum UserType

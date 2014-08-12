@@ -44,6 +44,16 @@
             End Set
         End Property
 
+		Private m_BudgetID As Integer = 0
+		Public Property BudgetID As Integer
+			Get
+				Return m_BudgetID
+			End Get
+			Set(value As Integer)
+				m_BudgetID = value
+			End Set
+		End Property
+
 #End Region
 
 #Region "Methods"
@@ -117,6 +127,16 @@
                 m_Description = value
             End Set
         End Property
+
+		Private m_BudgetID As Integer = 0
+		Public Property BudgetID As Integer
+			Get
+				Return m_BudgetID
+			End Get
+			Set(value As Integer)
+				m_BudgetID = value
+			End Set
+		End Property
 
         Private m_Status As New Generic.List(Of Integer)
         Public Property Status As Generic.List(Of Integer)

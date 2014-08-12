@@ -104,6 +104,16 @@
             End Set
         End Property
 
+		Private m_BudgetID As Long = 0
+		Public Property BudgetID As Long
+			Get
+				Return m_BudgetID
+			End Get
+			Set(value As Long)
+				m_BudgetID = value
+			End Set
+		End Property
+
         Private m_CreatedDate As DateTime = CDate("01/01/2000")
         Public ReadOnly Property CreatedDate As DateTime
             Get
@@ -278,6 +288,16 @@
                 m_CategoryID = value
             End Set
         End Property
+
+		Private m_BudgetID As Long = 0
+		Public Property BudgetID As Long
+			Get
+				Return m_BudgetID
+			End Get
+			Set(value As Long)
+				m_BudgetID = value
+			End Set
+		End Property
 
 		Private m_CreatedDateFrom As DateTime = CDate("01/01/2000")
 		Public Property CreatedDateFrom As DateTime

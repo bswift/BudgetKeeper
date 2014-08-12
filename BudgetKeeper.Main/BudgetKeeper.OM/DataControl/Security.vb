@@ -26,10 +26,12 @@
                 Case Enumerations.ObjectType.Location
                     Return SaveLocation(obj)
                 Case Enumerations.ObjectType.Category
-                    Return SaveCategory(obj)
-                Case Else
-                    Throw New Exception("Object not a valid type to save: " & obj.ObjectType.ToString())
-            End Select
+					Return SaveCategory(obj)
+				Case Enumerations.ObjectType.Budget
+					Return SaveBudget(obj)
+				Case Else
+					Throw New Exception("Object not a valid type to save: " & obj.ObjectType.ToString())
+			End Select
         Catch ex As Exception
             Throw ex
         End Try
@@ -93,6 +95,18 @@
         End If
         Return objID
     End Function
+
+	Public Function SaveBudget(ByVal obj As Objects.Budget) As Long
+		Dim objID As Long = 0
+		If m_LoginID <> 0 Then
+			If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor Then
+				objID = m_SQL.SaveObject_Budget(obj)
+			End If
+		Else
+			Throw New Exception("You must be logged in to save.")
+		End If
+		Return objID
+	End Function
 
     Friend Function DecryptSessionString(ByVal SessionString As String) As String()
         Try
@@ -333,10 +347,18 @@
     Private Sub GetCategory(ByRef InCategory As Objects.Category)
         Dim c As Objects.Category = m_SQL.GetObject_Category(InCategory.ID)
         If c Is Nothing Then
-            Throw New Exception(String.Format("User with ID {0} not found in system.", InCategory.ID))
+			Throw New Exception(String.Format("Category with ID {0} not found in system.", InCategory.ID))
         End If
 		InCategory = c
     End Sub
+
+	Private Sub GetBudget(ByRef InBudget As Objects.Budget)
+		Dim b As Objects.Budget = m_SQL.GetObject_Budget(InBudget.ID)
+		If b Is Nothing Then
+			Throw New Exception(String.Format("Budget with ID {0} not found in system.", InBudget.ID))
+		End If
+		InBudget = b
+	End Sub
 
 #End Region
 
@@ -448,6 +470,27 @@
         Return InCategoryColl.Count
     End Function
 
+	Private Function GetBudgetCollection(ByRef InBudgetColl As Objects.BudgetCollection) As Integer
+		If InBudgetColl.m_Filter Is Nothing Then InBudgetColl.m_Filter = New Objects.BudgetFilter
+
+		If InBudgetColl.Filter.CountOnly Then
+			Dim thisct As Integer = 0
+			m_SQL.GetCollection_Budget(InBudgetColl.m_Filter)
+			Return thisct
+		Else
+			Dim bcoll As Objects.BudgetCollection = m_SQL.GetCollection_Budget(InBudgetColl.m_Filter)
+			If bcoll Is Nothing Then
+				Throw New Exception(String.Format("An unexpected problem occurred during Budget fill."))
+			End If
+
+			For Each b As Objects.Budget In bcoll
+				InBudgetColl.Add(b)
+			Next
+		End If
+
+		Return InBudgetColl.Count
+	End Function
+
 #End Region
 
 #Region "Get Counts"
@@ -467,6 +510,8 @@
 					Return GetLocationCollection(InColl)
 				Case Enumerations.ObjectType.Category
 					Return GetCategoryCollection(InColl)
+				Case Enumerations.ObjectType.Budget
+					Return GetBudgetCollection(InColl)
 				Case Else
 					Throw New Exception("Object not a valid type to get count: " & InColl.ObjectType.ToString)
 			End Select

@@ -403,6 +403,7 @@ Friend Class SQL
 		If Not String.IsNullOrEmpty(Filter.Notes) Then FilterStr &= " AND (Notes = @Notes)"
 		If Filter.CategoryID > 0 Then FilterStr &= " AND (CategoryID = @CategoryID)"
 		If Filter.LocationID > 0 Then FilterStr &= " AND (LocationID = @LocationID)"
+		If Filter.LocationID > 0 Then FilterStr &= " AND (BudgetID = @BudgetID)"
 		If Filter.AmountFrom > -1.0 Then FilterStr &= "AND (Amount >= @AmountFrom"
 		If Filter.AmountTo > -1.0 Then FilterStr &= " AND (Amount <= @AmountTo"
 		If Filter.EntryType <> Enumerations.EntryType.Unknown Then FilterStr &= " AND (EntryType = @EntryType"
@@ -440,6 +441,10 @@ Friend Class SQL
 				If Filter.LocationID > 0 Then
 					command.Parameters.Add(New SqlParameter("@LocationID", SqlDbType.Int))
 					command.Parameters("@LocationID").Value = Filter.LocationID
+				End If
+				If Filter.LocationID > 0 Then
+					command.Parameters.Add(New SqlParameter("@BudgetID", SqlDbType.Int))
+					command.Parameters("@BudgetID").Value = Filter.BudgetID
 				End If
 				If Filter.AmountFrom > -1.0 Then
 					command.Parameters.Add(New SqlParameter("@AmountFrom", SqlDbType.Decimal))
@@ -518,6 +523,7 @@ Friend Class SQL
 			If Not String.IsNullOrEmpty(thisE.Notes) Then QueryStr &= ", Notes = @Notes"
 			If thisE.LocationID > 0 Then QueryStr &= ", LocationID = @LocationID"
 			If thisE.CategoryID > 0 Then QueryStr &= ", CategoryID = @CategoryID"
+			If thisE.BudgetID > 0 Then QueryStr &= ", BudgetID = @BudgetID"
 			If thisE.UserID > 0 Then QueryStr &= ", UserID = @UserID"
 			If thisE.UserType <> Nothing AndAlso thisE.UserType <> Enumerations.UserType.Unknown Then QueryStr &= ", UserType = @UserType"
 			If thisE.CreatedDate <> CDate("1/1/2000") Then QueryStr &= ", CreatedDate = @CreatedDate"
@@ -533,6 +539,7 @@ Friend Class SQL
 					command.Parameters.Add(New SqlParameter("@Notes", SqlDbType.VarChar, 2000))
 					command.Parameters.Add(New SqlParameter("@LocationID", SqlDbType.Int))
 					command.Parameters.Add(New SqlParameter("@CategoryID", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@BudgetID", SqlDbType.Int))
 					command.Parameters.Add(New SqlParameter("@UserID", SqlDbType.Int))
 					command.Parameters.Add(New SqlParameter("@UserType", SqlDbType.Int))
 					command.Parameters.Add(New SqlParameter("@CreatedDate", SqlDbType.DateTime))
@@ -545,6 +552,7 @@ Friend Class SQL
 					If Not String.IsNullOrEmpty(thisE.Notes) Then command.Parameters("@Notes").Value = thisE.Notes Else command.Parameters("@Notes").Value = ""
 					If thisE.LocationID > 0 Then command.Parameters("@LocationID").Value = thisE.LocationID Else command.Parameters("@LocationID").Value = 0
 					If thisE.CategoryID > 0 Then command.Parameters("@CategoryID").Value = thisE.CategoryID Else command.Parameters("@CategoryID").Value = 0
+					If thisE.BudgetID > 0 Then command.Parameters("@BudgetID").Value = thisE.BudgetID Else command.Parameters("@BudgetID").Value = 0
 					If thisE.UserID > 0 Then command.Parameters("@UserID").Value = thisE.UserID Else command.Parameters("@UserID").Value = 0
 					If thisE.UserType <> Nothing AndAlso thisE.UserType <> Enumerations.UserType.Unknown Then command.Parameters("@UserType").Value = thisE.UserType Else command.Parameters("@UserType").Value = -1
 					If thisE.CreatedDate <> CDate("1/1/2000") Then command.Parameters("@CreatedDate").Value = thisE.CreatedDate Else command.Parameters("@CreatedDate").Value = CDate("01/01/2000")
@@ -559,7 +567,7 @@ Friend Class SQL
 			End Using
 		Else
 			' Create a new Entry '
-			QueryStr = "INSERT INTO Entries (Amount, EntryType, UserID, UserType, [Description], Notes, LocationID, CategoryID, Image, CreatedDate, [Status]) VALUES (@Amount, @EntryType, @UserID, @UserType, @Description, @Notes, @LocationID, @CategoryID, @Image, @CreatedDate, @Status);"
+			QueryStr = "INSERT INTO Entries (Amount, EntryType, UserID, UserType, [Description], Notes, LocationID, CategoryID, BudgetID, Image, CreatedDate, [Status]) VALUES (@Amount, @EntryType, @UserID, @UserType, @Description, @Notes, @LocationID, @CategoryID, @Image, @CreatedDate, @Status);"
 
 			Using conn As New SqlConnection(ConnStr)
 				Using command As New SqlCommand(QueryStr, conn)
@@ -569,6 +577,7 @@ Friend Class SQL
 					command.Parameters.Add(New SqlParameter("@Notes", SqlDbType.VarChar, 2000))
 					command.Parameters.Add(New SqlParameter("@LocationID", SqlDbType.Int))
 					command.Parameters.Add(New SqlParameter("@CategoryID", SqlDbType.Int))
+					command.Parameters.Add(New SqlParameter("@BudgetID", SqlDbType.Int))
 					command.Parameters.Add(New SqlParameter("@UserID", SqlDbType.Int))
 					command.Parameters.Add(New SqlParameter("@UserType", SqlDbType.Int))
 					command.Parameters.Add(New SqlParameter("@CreatedDate", SqlDbType.DateTime))
@@ -583,6 +592,7 @@ Friend Class SQL
 					If Not String.IsNullOrEmpty(thisE.Notes) Then command.Parameters("@Notes").Value = thisE.Notes Else command.Parameters("@Notes").Value = ""
 					If thisE.LocationID > 0 Then command.Parameters("@LocationID").Value = thisE.LocationID Else command.Parameters("@LocationID").Value = 0
 					If thisE.CategoryID > 0 Then command.Parameters("@CategoryID").Value = thisE.CategoryID Else command.Parameters("@CategoryID").Value = 0
+					If thisE.BudgetID > 0 Then command.Parameters("@BudgetID").Value = thisE.BudgetID Else command.Parameters("@BudgetID").Value = 0
 					If thisE.Image IsNot Nothing AndAlso thisE.Image.Length > 0 Then command.Parameters("@Image").Value = thisE.Image Else command.Parameters("@Image").Value = New Byte() {}
 					If thisE.CreatedDate <> Nothing AndAlso thisE.CreatedDate <> CDate("01/01/2000") Then command.Parameters("@CreatedDate").Value = thisE.CreatedDate Else command.Parameters("@CreatedDate").Value = CDate("01/01/2000")
 					If thisE.Status <> Nothing AndAlso thisE.Status <> Enumerations.EntryStatus.Unknown Then command.Parameters("@Status").Value = thisE.Status Else command.Parameters("@Status").Value = -1
@@ -621,6 +631,7 @@ Friend Class SQL
 		If Not IsDBNull(r("Notes")) Then obj.Notes = r("Notes")
 		If Not IsDBNull(r("LocationID")) Then obj.LocationID = r("LocationID")
 		If Not IsDBNull(r("CategoryID")) Then obj.CategoryID = r("CategoryID")
+		If Not IsDBNull(r("BudgetID")) Then obj.CategoryID = r("BudgetID")
 
 	End Sub
 
@@ -688,6 +699,7 @@ Friend Class SQL
 		If Not String.IsNullOrEmpty(Filter.Name) Then FilterStr &= " AND (Name LIKE @Name)"
 		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= " AND ([Description] LIKE @Description)"
 		If Not String.IsNullOrEmpty(Filter.Url) Then FilterStr &= " AND (URL LIKE @URL)"
+		If Filter.BudgetID > 0 Then FilterStr &= " AND (BudgetID = @BudgetID)"
 		If Filter.HasImage Then FilterStr &= " AND (DATALENGTH(Image) > 0)"
 		If Filter.RangeLength > 0 Then FilterStr &= " AND (RowNum <= (@RangeLength + @RangeBegin) AND RowNum > @RangeBegin)"
 		If Not String.IsNullOrEmpty(Filter.Sort) Then FilterStr &= " ORDER BY @Sort"
@@ -1046,5 +1058,205 @@ Friend Class SQL
 	End Sub
 
 #End Region
+
+#Region "Budget"
+
+	Function GetObject_Budget(ByVal BudgetID As Integer) As Budget
+		Dim cat As Objects.Budget = Nothing
+		Dim catLst As New Objects.BudgetCollection
+
+		Using conn As New SqlConnection(ConnStr)
+			Using command As New SqlCommand("SELECT * FROM dbo.Budgets WHERE BudgetID = @BudgetID", conn)
+				command.Parameters.Add(New SqlParameter("@BudgetID", SqlDbType.Int))
+				command.Parameters("@BudgetID").Value = BudgetID
+				command.CommandType = System.Data.CommandType.Text
+				conn.Open()
+				Using reader = command.ExecuteReader()
+					While reader.Read
+						Dim newBudget = New Budget()
+						HydrateBudget(newBudget, reader)
+						catLst.Add(newBudget)
+					End While
+				End Using
+			End Using
+		End Using
+
+		If catLst.Count > 1 Then
+			Throw New Exception("Duplicate IDs found")
+		ElseIf catLst.Count = 1 Then
+			cat = catLst(0)
+		End If
+
+		Return cat
+	End Function
+
+	Function GetCollection_Budget(ByVal Filter As BudgetFilter, Optional ByRef ThisCount As Integer = 0) As BudgetCollection
+		Dim CatColl As New Objects.BudgetCollection()
+		Dim obj As New Budget()
+		Dim sqltext As String = ""
+
+		Dim FilterStr As String = ""
+		If Filter.ID > 0 Then
+			FilterStr &= String.Format(" AND (BudgetID = {0})", Filter.ID)
+		ElseIf Filter.MultiIDs.Count > 0 Then
+			FilterStr &= String.Format(" AND (")
+			Dim isfirst As Boolean = True
+			For Each id As Long In Filter.MultiIDs
+				If isfirst Then isfirst = False Else FilterStr &= String.Format(" OR ")
+				FilterStr &= String.Format("BudgetID = {0}", id)
+			Next
+			FilterStr &= String.Format(")")
+		End If
+		If Filter.Status.Count > 0 Then
+			FilterStr &= String.Format(" AND (")
+			Dim isfirst As Boolean = True
+			For Each s As Long In Filter.Status
+				If isfirst Then isfirst = False Else FilterStr &= String.Format(" OR ")
+				FilterStr &= String.Format("[Status] = {0}", s)
+			Next
+			FilterStr &= String.Format(")")
+		End If
+
+		If Not String.IsNullOrEmpty(Filter.Name) Then FilterStr &= " AND (Name LIKE @Name)"
+		If Not String.IsNullOrEmpty(Filter.Description) Then FilterStr &= " AND ([Description] LIKE @Description)"
+		If Filter.RangeLength > 0 Then FilterStr &= " AND (RowNum <= (@RangeLength + @RangeBegin) AND RowNum > @RangeBegin)"
+		If Not String.IsNullOrEmpty(Filter.Sort) Then FilterStr &= " ORDER BY @Sort"
+
+		If Filter.CountOnly Then
+			sqltext = String.Format("SELECT COUNT(BudgetID) AS 'Count' FROM Budgets WHERE 1 = 1{0}", FilterStr)
+		Else
+			sqltext = String.Format("SELECT rank() OVER (ORDER BY BudgetID) as 'RowNum',* FROM Budgets WHERE 1 = 1{0}", FilterStr)
+		End If
+
+		Using conn As New SqlConnection(ConnStr)
+			Using command As New SqlCommand(sqltext, conn)
+				If Not String.IsNullOrEmpty(Filter.Name) Then
+					command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
+					command.Parameters("@Name").Value = "%" & Filter.Name & "%"
+				End If
+				If Not String.IsNullOrEmpty(Filter.Description) Then
+					command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 200))
+					command.Parameters("@Description").Value = "%" & Filter.Description & "%"
+				End If
+				If Filter.RangeLength > 0 Then
+					command.Parameters.Add(New SqlParameter("@RangeLength", SqlDbType.Int))
+					command.Parameters("@RangeLength").Value = Filter.RangeLength
+				End If
+				If Filter.RangeBegin > 0 Then
+					command.Parameters.Add(New SqlParameter("@RangeBegin", SqlDbType.Int))
+					command.Parameters("@RangeBegin").Value = Filter.RangeBegin
+				End If
+				If Not String.IsNullOrEmpty(Filter.Sort) Then
+					command.Parameters.Add(New SqlParameter("@Sort", SqlDbType.VarChar, 50))
+					command.Parameters("@Sort").Value = Filter.Sort
+				End If
+
+				command.CommandType = System.Data.CommandType.Text
+				conn.Open()
+				Using reader = command.ExecuteReader()
+					While reader.Read
+						If Filter.CountOnly Then
+							If Not IsDBNull(reader("Count")) Then ThisCount = reader("Count")
+						Else
+							obj = New Objects.Budget
+							HydrateBudget(obj, reader)
+							CatColl.Add(obj)
+						End If
+					End While
+				End Using
+				conn.Close()
+			End Using
+		End Using
+
+		If Filter.CountOnly Then
+			Return Nothing
+		Else
+			Return CatColl
+		End If
+
+	End Function
+
+	Friend Function SaveObject_Budget(ByVal thisB As Budget) As Long
+		Dim QueryStr As String = "UPDATE Budgets SET "
+
+		If thisB.BudgetID > 0 OrElse thisB.SaveID > 0 Then
+			If thisB.BudgetID = 0 Then thisB.BudgetID = thisB.SaveID
+			If Not String.IsNullOrEmpty(thisB.Description) Then QueryStr &= "[Description] = @Description"
+			If Not String.IsNullOrEmpty(thisB.Name) Then QueryStr &= ", [Name] = @Name"
+			If thisB.CreatedDate <> CDate("01/01/2000") Then QueryStr &= "CreatedDate = @CreatedDate"
+			If thisB.Status <> Enumerations.BudgetStatus.Unknown Then QueryStr &= ", [Status] = @Status"
+			QueryStr &= " WHERE BudgetID = " & thisB.BudgetID
+
+			Using conn As New SqlConnection(ConnStr)
+				Using command As New SqlCommand(QueryStr, conn)
+					If Not String.IsNullOrEmpty(thisB.Description) Then
+						command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 2000))
+						command.Parameters("@Description").Value = thisB.Description
+					End If
+					If Not String.IsNullOrEmpty(thisB.Name) Then
+						command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
+						command.Parameters("@Name").Value = thisB.Name
+					End If
+					If thisB.Status <> Enumerations.BudgetStatus.Unknown Then
+						command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
+						command.Parameters("@Status").Value = thisB.Status
+					End If
+					If thisB.CreatedDate <> CDate("01/01/2000") Then
+						command.Parameters.Add(New SqlParameter("@CreatedDate", SqlDbType.DateTime))
+						command.Parameters("@CreatedDate").Value = thisB.CreatedDate
+					End If
+
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					command.ExecuteNonQuery()
+					conn.Close()
+				End Using
+			End Using
+		Else
+			' Create a new Budget '
+			QueryStr = "INSERT INTO Budgets (Name, [Description], [Status]) VALUES (@Name, @Description, @CreatedDate, @Status);"
+
+			Using conn As New SqlConnection(ConnStr)
+				Using command As New SqlCommand(QueryStr, conn)
+					command.Parameters.Add(New SqlParameter("@Name", SqlDbType.VarChar, 100))
+					command.Parameters.Add(New SqlParameter("@Description", SqlDbType.VarChar, 2000))
+					command.Parameters.Add(New SqlParameter("@CreatedDate", SqlDbType.DateTime))
+					command.Parameters.Add(New SqlParameter("@Status", SqlDbType.Int))
+
+					If Not String.IsNullOrEmpty(thisB.Name) Then command.Parameters("@Name").Value = thisB.Name Else command.Parameters("@Name").Value = ""
+					If Not String.IsNullOrEmpty(thisB.Description) Then command.Parameters("@Description").Value = thisB.Description Else command.Parameters("@Description").Value = ""
+					If thisB.CreatedDate <> CDate("01/01/2000") Then command.Parameters("@CreatedDate").Value = thisB.CreatedDate
+					If thisB.Status <> Nothing AndAlso thisB.Status <> Enumerations.BudgetStatus.Unknown Then command.Parameters("@Status").Value = thisB.Status Else command.Parameters("@Status").Value = -1
+
+					command.CommandType = System.Data.CommandType.Text
+					conn.Open()
+					Dim RowsAffected As Integer = 0
+					RowsAffected = command.ExecuteNonQuery()
+					If RowsAffected > 0 Then
+						command.CommandText = "SELECT TOP 1 BudgetID FROM Budgets ORDER BY BudgetID DESC"
+						Using reader = command.ExecuteReader()
+							While reader.Read
+								If Not IsDBNull(reader("BudgetID")) Then thisB.SetID(reader("BudgetID"))
+							End While
+						End Using
+					End If
+					conn.Close()
+				End Using
+			End Using
+		End If
+
+		Return thisB.BudgetID
+	End Function
+
+	Private Sub HydrateBudget(ByRef obj As Budget, ByVal r As System.Data.SqlClient.SqlDataReader)
+		If Not IsDBNull(r("BudgetID")) Then obj.SetID(r("BudgetID"))
+		If Not IsDBNull(r("Status")) Then obj.Status = r("Status")
+		If Not IsDBNull(r("Description")) Then obj.Description = r("Description")
+		If Not IsDBNull(r("Name")) Then obj.Name = r("Name")
+		If Not IsDBNull(r("CreatedDate")) Then obj.CreatedDate = r("CreatedDate")
+	End Sub
+
+#End Region
+
 
 End Class

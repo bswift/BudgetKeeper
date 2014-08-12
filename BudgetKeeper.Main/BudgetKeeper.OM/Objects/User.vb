@@ -332,6 +332,16 @@
             End Set
         End Property
 
+		Private m_BudgetIDs As New Generic.List(Of Integer)
+		Public Property BudgetIDs As Generic.List(Of Integer)
+			Get
+				Return m_BudgetIDs
+			End Get
+			Set(value As Generic.List(Of Integer))
+				m_BudgetIDs = value
+			End Set
+		End Property
+
 		Private m_Status As New Generic.List(Of Integer)
 		Public Property Status As Generic.List(Of Integer)
 			Get
