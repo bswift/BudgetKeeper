@@ -38,7 +38,8 @@
 		Unknown = -1
 		Admin = 1
 		Editor = 2
-		Viewer = 3
+		Contributor = 3
+		Viewer = 4
 	End Enum
 
 	Enum ObjectType
@@ -55,7 +56,8 @@
 		Unknown = -1
 		Admin = 1
 		Editor = 2
-		Viewer = 3
+		Contributor = 3
+		Viewer = 4
 	End Enum
 
 	Enum UserStatus

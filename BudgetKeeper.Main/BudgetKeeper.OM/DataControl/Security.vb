@@ -16,6 +16,7 @@
 
 	Public Function SaveSecureObject(obj As Object) As Long
 		If m_LoginID = 0 Then Throw New Exception("Log in to save an object.")
+		If m_LoginType <> Enumerations.LoginType.Admin AndAlso m_LoginType <> Enumerations.LoginType.Editor Then Throw New Exception("You do not have permission to save.")
 
 		Try
 			Select Case obj.ObjectType
@@ -40,32 +41,36 @@
 
     Public Function SaveUser(ByVal obj As Objects.User) As Long
         Dim objID As Long = 0
-        If m_LoginID <> 0 Then
-            If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginID = obj.UserID Then
-                Dim enc As New Encryption.AES
-                enc.IV = m_IV
-                enc.Key = m_Key
-                If obj.UserID = 0 AndAlso obj.SaveID = 0 Then
-                    obj.SetCreatedDate(DateTime.Now)
+		If m_LoginID <> 0  Then
+			If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginID = obj.UserID Then
+				Dim enc As New Encryption.AES
+				enc.IV = m_IV
+				enc.Key = m_Key
+				If obj.UserID = 0 AndAlso obj.SaveID = 0 Then
+					obj.SetCreatedDate(DateTime.Now)
 					obj.SetLastLogin(CDate("01/01/2000"))
-                End If
-                If Not String.IsNullOrEmpty(obj.Password) Then
-                    obj.Password = enc.EncryptString(obj.Password)
-                End If
-                objID = m_SQL.SaveObject_User(obj)
-            End If
-        Else
-            Throw New Exception("You must be logged in to save.")
-        End If
+				End If
+				If Not String.IsNullOrEmpty(obj.Password) Then
+					obj.Password = enc.EncryptString(obj.Password)
+				End If
+				objID = m_SQL.SaveObject_User(obj)
+			Else
+				Throw New Exception("You are not authorized to save or modify this user.")
+			End If
+		Else
+			Throw New Exception("You must be logged in to save.")
+		End If
         Return objID
     End Function
 
     Public Function SaveEntry(ByVal obj As Objects.Entry) As Long
         Dim objID As Long = 0
         If m_LoginID <> 0 Then
-            If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor Then
-                objID = m_SQL.SaveObject_Entry(obj)
-            End If
+			If (m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor) OrElse (m_LoginType = Enumerations.LoginType.Contributor AndAlso m_LoginID = obj.UserID) Then
+				objID = m_SQL.SaveObject_Entry(obj)
+			Else
+				Throw New Exception("You are not authorized to save this entry.")
+			End If
         Else
             Throw New Exception("You must be logged in to save.")
         End If
