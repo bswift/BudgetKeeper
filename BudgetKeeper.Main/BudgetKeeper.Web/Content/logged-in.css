@@ -1,0 +1,34 @@
+﻿html {
+	min-width: 100%;
+	min-height: 100%;
+}
+
+body{
+	height: 100%;
+	width: 100%;
+}
+
+/*--- Layout ---*/
+.header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 30px;
+	background-color: #0094ff;
+	width: 100%;
+}
+
+.body {
+	margin-top: 30px;
+}
+
+.footer {
+
+}
+/*--- End Layout ---*/
+
+/*--- Page Content ---*/
+.main {
+	width: 100%;
+}
+/*--- End Page Content ---*/
