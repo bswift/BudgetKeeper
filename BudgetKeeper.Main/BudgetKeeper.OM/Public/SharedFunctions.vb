@@ -113,7 +113,7 @@ Public Class SharedFunctions
 
 	Public Shared Function EmailTaken(ByVal ConnStr As String, ByVal EmailToCheck As String) As Boolean
 		Dim C As New Connector(ConnStr)
-		C.LogIn(m_GenericAdminName, m_GenericAdminPass)
+		C.LogIn(m_GenericAdminName, m_GenericAdminPass, "")
 		Dim inthere As Boolean = C.Security.CheckEmail(EmailToCheck)
 		Return inthere
 	End Function

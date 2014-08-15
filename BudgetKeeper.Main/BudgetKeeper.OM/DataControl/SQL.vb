@@ -20,19 +20,20 @@ Friend Class SQL
 				Using reader = command.ExecuteReader()
 					While reader.Read
 						Dim newUser = New User()
-						newUser.Entries = New EntryCollection()
+						HydrateUser(newUser, reader)
+						'newUser.Entries = New EntryCollection()
 
-						If Not IsDBNull(reader("UserID")) Then newUser.SetID(reader("UserID"))
-						If Not IsDBNull(reader("Status")) Then newUser.Status = reader("Status")
-						If Not IsDBNull(reader("UserType")) Then newUser.UserType = reader("UserType")
-						If Not IsDBNull(reader("Username")) AndAlso Not String.IsNullOrEmpty(reader("Username")) Then newUser.Username = reader("Username")
-						If Not IsDBNull(reader("Password")) AndAlso Not String.IsNullOrEmpty(reader("Password")) Then newUser.Password = reader("Password")
-                        If Not IsDBNull(reader("Name")) AndAlso Not String.IsNullOrEmpty(reader("Name")) Then newUser.FullName = reader("Name")
-                        If Not IsDBNull(reader("Email")) AndAlso Not String.IsNullOrEmpty(reader("Email")) Then newUser.Email = reader("Email")
-                        If Not IsDBNull(reader("Phone")) AndAlso Not String.IsNullOrEmpty(reader("Phone")) Then newUser.Phone = reader("Phone")
-						If Not IsDBNull(reader("CreatedDate")) Then newUser.SetCreatedDate(reader("CreatedDate"))
-						If Not IsDBNull(reader("LastLogin")) Then newUser.SetLastLogin(reader("LastLogin"))
-						If Not IsDBNull(reader("Image")) AndAlso reader("Image").Length > 0 Then newUser.Image = reader("Image")
+						'If Not IsDBNull(reader("UserID")) Then newUser.SetID(reader("UserID"))
+						'If Not IsDBNull(reader("Status")) Then newUser.Status = reader("Status")
+						'If Not IsDBNull(reader("UserType")) Then newUser.UserType = reader("UserType")
+						'If Not IsDBNull(reader("Username")) AndAlso Not String.IsNullOrEmpty(reader("Username")) Then newUser.Username = reader("Username")
+						'If Not IsDBNull(reader("Password")) AndAlso Not String.IsNullOrEmpty(reader("Password")) Then newUser.Password = reader("Password")
+						'                  If Not IsDBNull(reader("Name")) AndAlso Not String.IsNullOrEmpty(reader("Name")) Then newUser.FullName = reader("Name")
+						'                  If Not IsDBNull(reader("Email")) AndAlso Not String.IsNullOrEmpty(reader("Email")) Then newUser.Email = reader("Email")
+						'                  If Not IsDBNull(reader("Phone")) AndAlso Not String.IsNullOrEmpty(reader("Phone")) Then newUser.Phone = reader("Phone")
+						'If Not IsDBNull(reader("CreatedDate")) Then newUser.SetCreatedDate(reader("CreatedDate"))
+						'If Not IsDBNull(reader("LastLogin")) Then newUser.SetLastLogin(reader("LastLogin"))
+						'If Not IsDBNull(reader("Image")) AndAlso reader("Image").Length > 0 Then newUser.Image = reader("Image")
 
 						uColl.Add(newUser)
 					End While
@@ -46,18 +47,19 @@ Friend Class SQL
 					Using reader = command.ExecuteReader()
 						While reader.Read
 							Dim newUser = New User()
-							newUser.Entries = New EntryCollection()
+							HydrateUser(newUser, reader)
+							'newUser.Entries = New EntryCollection()
 
-							If Not IsDBNull(reader("UserID")) Then newUser.SetID(reader("UserID"))
-							If Not IsDBNull(reader("Status")) Then newUser.Status = reader("Status")
-							If Not IsDBNull(reader("UserType")) Then newUser.UserType = reader("UserType")
-							If Not IsDBNull(reader("Username")) AndAlso Not String.IsNullOrEmpty(reader("Username")) Then newUser.Username = reader("Username")
-							If Not IsDBNull(reader("Password")) AndAlso Not String.IsNullOrEmpty(reader("Password")) Then newUser.Password = reader("Password")
-							If Not IsDBNull(reader("Name")) AndAlso Not String.IsNullOrEmpty(reader("Name")) Then newUser.FullName = reader("Name")
-							If Not IsDBNull(reader("Email")) AndAlso Not String.IsNullOrEmpty(reader("Email")) Then newUser.Email = reader("Email")
-							If Not IsDBNull(reader("Phone")) AndAlso Not String.IsNullOrEmpty(reader("Phone")) Then newUser.Phone = reader("Phone")
-							If Not IsDBNull(reader("CreatedDate")) AndAlso Not String.IsNullOrEmpty(reader("CreatedDate")) Then newUser.SetCreatedDate(CDate(reader("CreatedDate")))
-							If Not IsDBNull(reader("LastLogin")) AndAlso Not String.IsNullOrEmpty(reader("LastLogin")) Then newUser.SetLastLogin(CDate(reader("LastLogin")))
+							'If Not IsDBNull(reader("UserID")) Then newUser.SetID(reader("UserID"))
+							'If Not IsDBNull(reader("Status")) Then newUser.Status = reader("Status")
+							'If Not IsDBNull(reader("UserType")) Then newUser.UserType = reader("UserType")
+							'If Not IsDBNull(reader("Username")) AndAlso Not String.IsNullOrEmpty(reader("Username")) Then newUser.Username = reader("Username")
+							'If Not IsDBNull(reader("Password")) AndAlso Not String.IsNullOrEmpty(reader("Password")) Then newUser.Password = reader("Password")
+							'If Not IsDBNull(reader("Name")) AndAlso Not String.IsNullOrEmpty(reader("Name")) Then newUser.FullName = reader("Name")
+							'If Not IsDBNull(reader("Email")) AndAlso Not String.IsNullOrEmpty(reader("Email")) Then newUser.Email = reader("Email")
+							'If Not IsDBNull(reader("Phone")) AndAlso Not String.IsNullOrEmpty(reader("Phone")) Then newUser.Phone = reader("Phone")
+							'If Not IsDBNull(reader("CreatedDate")) AndAlso Not String.IsNullOrEmpty(reader("CreatedDate")) Then newUser.SetCreatedDate(CDate(reader("CreatedDate")))
+							'If Not IsDBNull(reader("LastLogin")) AndAlso Not String.IsNullOrEmpty(reader("LastLogin")) Then newUser.SetLastLogin(CDate(reader("LastLogin")))
 
 							uColl.Add(newUser)
 						End While
@@ -138,7 +140,7 @@ Friend Class SQL
 		End If
 		If Not String.IsNullOrEmpty(Filter.Username) Then FilterStr &= " AND (Username LIKE @Username)"
 		If Not String.IsNullOrEmpty(Filter.Phone) Then FilterStr &= " AND (Phone = @Phone)"
-		If Not String.IsNullOrEmpty(Filter.Email) Then FilterStr &= " AND (Email = @Email)"
+		If Not String.IsNullOrEmpty(Filter.Email) Then FilterStr &= " AND (Email LIKE @Email)"
 		If Not String.IsNullOrEmpty(Filter.Name) Then FilterStr &= " AND (Name LIKE @Name)"
 		If Filter.CreatedDateFrom > CDate("1/1/2000") Then FilterStr &= " AND (CreatedDate >= @CreatedDateFrom)"
 		If Filter.CreatedDateTo > CDate("1/1/2000") Then FilterStr &= " AND (CreatedDate <= @CreatedDateTo)"
@@ -232,16 +234,70 @@ Friend Class SQL
 		If thisU.UserID > 0 OrElse thisU.SaveID > 0 Then
 			If thisU.UserID = 0 Then thisU.UserID = thisU.SaveID
 
-			If Not String.IsNullOrEmpty(thisU.FullName) Then QueryStr &= "Name = @Name"
-			If Not String.IsNullOrEmpty(thisU.Username) Then QueryStr &= ", Username = @Username"
-			If Not String.IsNullOrEmpty(thisU.Password) Then QueryStr &= ", Password = @Password"
-			If thisU.UserType <> Enumerations.UserType.Unknown Then QueryStr &= ", UserType = @UserType"
-			If Not String.IsNullOrEmpty(thisU.Email) Then QueryStr &= ", Email = @Email"
-			If Not String.IsNullOrEmpty(thisU.Phone) Then QueryStr &= ", Phone = @Phone"
-			If thisU.CreatedDate <> CDate("1/1/2000") Then QueryStr &= ", CreatedDate = @CreatedDate"
-			If thisU.LastLogin <> CDate("1/1/2000") Then QueryStr &= ", LastLogin = @LastLogin"
-			If thisU.Image IsNot Nothing AndAlso thisU.Image.Length > 0 Then QueryStr &= ", Image = @Image"
-			If thisU.Status <> Enumerations.UserStatus.Unknown Then QueryStr &= ", [Status] = @Status"
+			If Not String.IsNullOrEmpty(thisU.FullName) Then QueryStr &= "[Name] = @Name"
+			If Not String.IsNullOrEmpty(thisU.Username) Then
+				If Not String.IsNullOrEmpty(thisU.FullName) Then
+					QueryStr &= ", [Username] = @Username"
+				Else
+					QueryStr &= "[Username] = @Username"
+				End If
+			End If
+			If Not String.IsNullOrEmpty(thisU.Password) Then
+				If Not String.IsNullOrEmpty(thisU.FullName) OrElse Not String.IsNullOrEmpty(thisU.Username) Then
+					QueryStr &= ", [Password] = @Password"
+				Else
+					QueryStr &= "[Password] = @Password"
+				End If
+			End If
+			If thisU.UserType <> Enumerations.UserType.Unknown Then
+				If Not String.IsNullOrEmpty(thisU.FullName) OrElse Not String.IsNullOrEmpty(thisU.Username) OrElse Not String.IsNullOrEmpty(thisU.Password) Then
+					QueryStr &= ", [UserType] = @UserType"
+				Else
+					QueryStr &= "[UserType] = @UserType"
+				End If
+			End If
+			If Not String.IsNullOrEmpty(thisU.Email) Then
+				If Not String.IsNullOrEmpty(thisU.FullName) OrElse Not String.IsNullOrEmpty(thisU.Username) OrElse Not String.IsNullOrEmpty(thisU.Password) OrElse thisU.UserType <> Enumerations.UserType.Unknown Then
+					QueryStr &= ", [Email] = @Email"
+				Else
+					QueryStr &= "[Email] = @Email"
+				End If
+			End If
+			If Not String.IsNullOrEmpty(thisU.Phone) Then
+				If Not String.IsNullOrEmpty(thisU.FullName) OrElse Not String.IsNullOrEmpty(thisU.Username) OrElse Not String.IsNullOrEmpty(thisU.Password) OrElse thisU.UserType <> Enumerations.UserType.Unknown OrElse Not String.IsNullOrEmpty(thisU.Email) Then
+					QueryStr &= ", [Phone] = @Phone"
+				Else
+					QueryStr &= "[Phone] = @Phone"
+				End If
+			End If
+			If thisU.CreatedDate <> CDate("1/1/2000") Then
+				If Not String.IsNullOrEmpty(thisU.FullName) OrElse Not String.IsNullOrEmpty(thisU.Username) OrElse Not String.IsNullOrEmpty(thisU.Password) OrElse thisU.UserType <> Enumerations.UserType.Unknown OrElse Not String.IsNullOrEmpty(thisU.Email) OrElse Not String.IsNullOrEmpty(thisU.Phone) Then
+					QueryStr &= ", [CreatedDate] = @CreatedDate"
+				Else
+					QueryStr &= "[CreatedDate] = @CreatedDate"
+				End If
+			End If
+			If thisU.LastLogin <> CDate("1/1/2000") Then
+				If Not String.IsNullOrEmpty(thisU.FullName) OrElse Not String.IsNullOrEmpty(thisU.Username) OrElse Not String.IsNullOrEmpty(thisU.Password) OrElse thisU.UserType <> Enumerations.UserType.Unknown OrElse Not String.IsNullOrEmpty(thisU.Email) OrElse Not String.IsNullOrEmpty(thisU.Phone) OrElse thisU.CreatedDate <> CDate("1/1/2000") Then
+					QueryStr &= ", [LastLogin] = @LastLogin"
+				Else
+					QueryStr &= "[LastLogin] = @LastLogin"
+				End If
+			End If
+			If thisU.Image IsNot Nothing AndAlso thisU.Image.Length > 0 Then
+				If Not String.IsNullOrEmpty(thisU.FullName) OrElse Not String.IsNullOrEmpty(thisU.Username) OrElse Not String.IsNullOrEmpty(thisU.Password) OrElse thisU.UserType <> Enumerations.UserType.Unknown OrElse Not String.IsNullOrEmpty(thisU.Email) OrElse Not String.IsNullOrEmpty(thisU.Phone) OrElse thisU.CreatedDate <> CDate("1/1/2000") OrElse thisU.LastLogin <> CDate("1/1/2000") Then
+					QueryStr &= ", [Image] = @Image"
+				Else
+					QueryStr &= "[Image] = @Image"
+				End If
+			End If
+			If thisU.Status <> Enumerations.UserStatus.Unknown Then
+				If Not String.IsNullOrEmpty(thisU.FullName) OrElse Not String.IsNullOrEmpty(thisU.Username) OrElse Not String.IsNullOrEmpty(thisU.Password) OrElse thisU.UserType <> Enumerations.UserType.Unknown OrElse Not String.IsNullOrEmpty(thisU.Email) OrElse Not String.IsNullOrEmpty(thisU.Phone) OrElse thisU.CreatedDate <> CDate("1/1/2000") OrElse thisU.LastLogin <> CDate("1/1/2000") OrElse thisU.Image IsNot Nothing AndAlso thisU.Image.Length > 0 Then
+					QueryStr &= ", [Status] = @Status"
+				Else
+					QueryStr &= "[Status] = @Status"
+				End If
+			End If
 
 			QueryStr &= " WHERE UserID = " & thisU.UserID
 			Using conn As New SqlConnection(ConnStr)
@@ -277,7 +333,7 @@ Friend Class SQL
 			End Using
 		Else
 			' Create a new user '
-			QueryStr = "Username, Password, UserType, Name, Email, Phone, CreatedDate, LastLogin, Image, [Status]"
+			QueryStr = "Username, Password, UserType, [Name], Email, Phone, CreatedDate, LastLogin, Image, [Status]"
 			Query2 = "@Username, @Password, @UserType, @Name, @Email, @Phone, @CreatedDate, @LastLogin, @Image, @Status"
 
 			Using conn As New SqlConnection(ConnStr)

@@ -5,7 +5,7 @@ Public Class frm_OM_Test
     Private Sub btn_Login_Click(sender As Object, e As EventArgs) Handles btn_Login.Click
         Try
             Dim conn As New Connector()
-            conn.LogIn(txt_Username.Text, txt_Password.Text)
+			conn.LogIn(txt_Username.Text, txt_Password.Text, "")
 
 			'Dim hello As Objects.User = CType(conn.GetBase(3, Enumerations.ObjectType.User), Objects.User)
 			'hello.Email = "ben.swift@live.com"

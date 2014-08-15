@@ -66,7 +66,14 @@
     Public Function SaveEntry(ByVal obj As Objects.Entry) As Long
         Dim objID As Long = 0
         If m_LoginID <> 0 Then
-			If (m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor) OrElse (m_LoginType = Enumerations.LoginType.Contributor AndAlso m_LoginID = obj.UserID) Then
+			If (m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor OrElse m_LoginType = Enumerations.LoginType.Contributor) Then
+				If m_LoginType = Enumerations.LoginType.Contributor Then
+					If obj.ID > 0 AndAlso obj.SaveID > 0 AndAlso m_LoginID <> obj.UserID Then
+						Throw New Exception("You are not authorized to modify this entry.")
+					End If
+					obj.UserID = m_LoginID
+					obj.UserType = Enumerations.UserType.Contributor
+				End If
 				objID = m_SQL.SaveObject_Entry(obj)
 			Else
 				Throw New Exception("You are not authorized to save this entry.")

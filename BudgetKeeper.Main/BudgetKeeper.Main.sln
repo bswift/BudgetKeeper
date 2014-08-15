@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{91D5FB
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BudgetKeeper.Web", "BudgetKeeper.Web\BudgetKeeper.Web.csproj", "{93AC4412-EFBA-4412-90FD-D495F5D93001}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BudgetKeeper.Web", "BudgetKeeper.Web\BudgetKeeper.Web.csproj", "{A906CC97-3F4A-4E5B-9C4F-B825E39DAEB6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,10 +32,10 @@ Global
 		{DFE35FF0-3AF9-494B-8487-F0ADE3510F4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFE35FF0-3AF9-494B-8487-F0ADE3510F4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFE35FF0-3AF9-494B-8487-F0ADE3510F4F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{93AC4412-EFBA-4412-90FD-D495F5D93001}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{93AC4412-EFBA-4412-90FD-D495F5D93001}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{93AC4412-EFBA-4412-90FD-D495F5D93001}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{93AC4412-EFBA-4412-90FD-D495F5D93001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A906CC97-3F4A-4E5B-9C4F-B825E39DAEB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A906CC97-3F4A-4E5B-9C4F-B825E39DAEB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A906CC97-3F4A-4E5B-9C4F-B825E39DAEB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A906CC97-3F4A-4E5B-9C4F-B825E39DAEB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -244,14 +244,14 @@
 		Return Nothing
 	End Function
 
-	Public Function LogIn(ByVal User As String, ByVal Pass As String) As Objects._Base
+	Public Function LogIn(ByVal User As String, ByVal Pass As String, Optional UserIP As String = "") As Objects._Base
 		Try
-			Dim UserIP As String = ""
 			m_Security.SetConnectionString(m_ConnectionString)
 			Dim u As Objects.User = m_Security.Login(User, Pass)
 			If u IsNot Nothing AndAlso u.UserID > 0 Then
 				u.Parent = Me
 				m_LoggedInUser = u
+				m_LoginType = u.UserType
 				m_LoggedIn = True
 				m_PublicLoggedInUser = u
 				m_SessionString = m_Security.CreateSessionString(PublicLoggedInUser.ID, m_LoginType, UserIP)
