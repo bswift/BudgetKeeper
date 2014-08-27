@@ -10,11 +10,22 @@ namespace BudgetKeeper.Web {
 						"~/Scripts/Libs/knockout-{version}.js",
 						"~/Scripts/Libs/modernizr-*",
 						"~/Scripts/Libs/bootstrap.js",
-					    "~/Scripts/Libs/respond.js"));
+						"~/Scripts/Libs/respond.js"));
+
+			bundles.Add(new ScriptBundle("~/bundles/account").Include(
+						"~/Scripts/Account/global.js",
+						"~/Scripts/Account/nav.js",
+						"~/Scripts/Account/dashboard.js",
+						"~/Scripts/Account/settings.js",
+						"~/Scripts/Account/app.js"));
 
 			bundles.Add(new StyleBundle("~/Content/css").Include(
 					  "~/Content/bootstrap.css",
 					  "~/Content/site.css"));
+
+			bundles.Add(new StyleBundle("~/Content/pre-logged-in").Include(
+					  "~/Content/bootstrap.css",
+					  "~/Content/pre-logged-in.css"));
 
 			bundles.Add(new StyleBundle("~/Content/logged-in").Include(
 					  "~/Content/bootstrap.css",

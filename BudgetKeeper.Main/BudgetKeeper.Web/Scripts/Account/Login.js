@@ -14,10 +14,12 @@ function Bindings() {
 					Password: $("#Password").val()
 				}),
 				success: function (result) {
-					var a = "";
+					if (result.Success) {
+						window.location.href = "/Account/";
+					}
 				},
 				error: function (result) {
-					var a = "";
+					alert("error");
 				}
 			});
 		}

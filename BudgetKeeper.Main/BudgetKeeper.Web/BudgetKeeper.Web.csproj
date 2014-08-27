@@ -140,15 +140,21 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Account\logged-in.css" />
     <Content Include="Content\Account\Login.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
-    <Content Include="Content\logged-in.css" />
+    <Content Include="Content\pre-logged-in.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
-    <Content Include="Scripts\Account\Login.js" />
+    <Content Include="Scripts\Account\app.js" />
+    <Content Include="Scripts\Account\dashboard.js" />
+    <Content Include="Scripts\Account\global.js" />
+    <Content Include="Scripts\Account\login.js" />
+    <Content Include="Scripts\Account\nav.js" />
+    <Content Include="Scripts\Account\settings.js" />
     <Content Include="Scripts\Libs\bootstrap.js" />
     <Content Include="Scripts\Libs\bootstrap.min.js" />
     <None Include="Scripts\Libs\jquery-1.10.2.intellisense.js" />
@@ -177,6 +183,9 @@
     <Content Include="Views\Shared\_LoggedIn.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Account\settings.cshtml" />
+    <Content Include="Views\Account\Index.cshtml" />
+    <Content Include="Views\Account\dashboard.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

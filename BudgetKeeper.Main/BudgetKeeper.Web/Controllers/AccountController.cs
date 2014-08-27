@@ -14,6 +14,10 @@ namespace BudgetKeeper.Web.Controllers {
 		private const string ADMIN_LOGIN = "BK_Admin";
 		private const string ADMIN_PASS = @"MCD14lb$:";
 
+		public ActionResult Index() {
+			return View();
+		}
+
 		[System.Web.Mvc.HttpGet]
 		public ActionResult Login() {
 			return View();

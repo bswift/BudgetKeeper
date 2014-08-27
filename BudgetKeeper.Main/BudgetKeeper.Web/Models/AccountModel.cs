@@ -4,6 +4,14 @@ using System.Linq;
 using System.Web;
 
 namespace BudgetKeeper.Web.Models {
+	public class DashboardModel {
+
+	}
+
+	public class IndexModel {
+
+	}
+	
 	public class LoginModel {
 		public string Username { get; set; }
 		public string Password { get; set; }
@@ -16,5 +24,9 @@ namespace BudgetKeeper.Web.Models {
 		public string Email { get; set; }
 
 		public string Phone { get; set; }
+	}
+
+	public class SettingsModel {
+
 	}
 }
