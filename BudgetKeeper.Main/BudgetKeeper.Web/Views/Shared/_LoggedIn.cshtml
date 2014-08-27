@@ -4,7 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - My ASP.NET Application</title>
-    @Styles.Render("~/Content/logged-in")
+    	@Styles.Render("~/Content/logged-in")
+		@Scripts.Render("~/bundles/Libs")
+		@RenderSection("scripts", required: false)
 </head>
 <body>
     <div class="header"></div>
@@ -13,7 +15,5 @@
 	</div>
 	<div class="footer"></div>
 
-    @Scripts.Render("~/bundles/Libs")
-    @RenderSection("scripts", required: false)
 </body>
 </html>

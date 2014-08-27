@@ -19,7 +19,6 @@ namespace BudgetKeeper.Web.Controllers.Api
 			Connector cnAdmin = null;
 			HttpResponseMessage resp = null;
 
-
 			try {
 				cnAdmin = CommonFunctions.GetConnector(ADMIN_LOGIN, ADMIN_PASS, Enumerations.LoginType.Admin);
 				if (cnAdmin == null || !cnAdmin.LoggedIn) {
@@ -50,39 +49,31 @@ namespace BudgetKeeper.Web.Controllers.Api
 				cnAdmin.Users.Filter.Status.Add((int)Enumerations.UserStatus.Active);
 				cnAdmin.Users.Populate();
 
+				thisconn = CommonFunctions.GetConnector(model.Username, model.Password, (Enumerations.LoginType)cnAdmin.Users[0].UserType, ((System.Web.HttpContextWrapper)Request.Properties["MS_HttpContext"]).Request.UserHostAddress);
+
+				thisconn.PublicLoggedInUser.Parent = null;
+				rjo.SetSuccessData(thisconn.PublicLoggedInUser);
+				SessionID = thisconn.SessionString;
+
 			}
 			catch (Exception ex) {
-
+				rjo.SetFailureData(ex.Message);
 			}
 
+			resp = Request.CreateResponse<ReturnJsonObject>(HttpStatusCode.Created, rjo);
+			if (rjo.Success && !string.IsNullOrEmpty(SessionID)) {
+				// Delete prior cookies
+				System.Collections.ObjectModel.Collection<System.Net.Http.Headers.CookieHeaderValue> chvs = Request.Headers.GetCookies("Snickerdoodle");
+				foreach (System.Net.Http.Headers.CookieHeaderValue chv in chvs) {
+					System.Collections.Generic.List<System.Net.Http.Headers.CookieHeaderValue> cookietray = BudgetKeeper.Web.CodeFiles.CookieFactory.EatCookie(chv);
+					resp.Headers.AddCookies(cookietray);
+				}
+
+				List<System.Net.Http.Headers.CookieHeaderValue> chl = BudgetKeeper.Web.CodeFiles.CookieFactory.CookieJar(SessionID);
+				resp.Headers.AddCookies(chl);
+			}
+
+			return resp;
 		}
-
-
-        // GET api/auth
-		//public IEnumerable<string> Get()
-		//{
-		//	return new string[] { "value1", "value2" };
-		//}
-
-		//// GET api/auth/5
-		//public string Get(int id)
-		//{
-		//	return "value";
-		//}
-
-		//// POST api/auth
-		//public void Post([FromBody]string value)
-		//{
-		//}
-
-		//// PUT api/auth/5
-		//public void Put(int id, [FromBody]string value)
-		//{
-		//}
-
-		//// DELETE api/auth/5
-		//public void Delete(int id)
-		//{
-		//}
     }
 }

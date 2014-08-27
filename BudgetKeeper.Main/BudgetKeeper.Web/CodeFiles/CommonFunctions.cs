@@ -140,7 +140,7 @@ public class ReturnJsonObject {
 	public object Response { get; set; }
 	public bool Success { get; set; }
 	public string Message { get; set; }
-	public Opendorse.Enumerations.SiteErrors ErrCode { get; set; }
+	public int ErrCode { get; set; }
 	public object ExtraProperties { get; set; }
 
 	public void SetExtraProperties(object ExtraProperties) {
@@ -150,7 +150,7 @@ public class ReturnJsonObject {
 		this.Response = Response;
 		this.Message = "Success.";
 		this.Success = true;
-		this.ErrCode = Opendorse.Enumerations.SiteErrors.None;
+		this.ErrCode = 0;
 	}
 
 	public void SetFailureData(string Message) {
@@ -158,7 +158,7 @@ public class ReturnJsonObject {
 		this.Success = false;
 	}
 
-	public void SetFailureData(string Message, Opendorse.Enumerations.SiteErrors ErrorCode) {
+	public void SetFailureData(string Message, int ErrorCode) {
 		this.Message = Message;
 		this.Success = false;
 		this.ErrCode = ErrorCode;
@@ -169,7 +169,7 @@ public class ReturnJsonObject {
 		ExtraProperties = null;
 		Success = false;
 		Message = "";
-		ErrCode = Opendorse.Enumerations.SiteErrors.Unknown;
+		ErrCode = -1;
 	}
 }
 

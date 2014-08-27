@@ -1,9 +1,21 @@
-﻿@model BudgetKeeper.Web.Models.Account.LoginModel
+﻿@model BudgetKeeper.Web.Models.LoginModel
 
 @{
     ViewBag.Title = "Login";
     Layout = "~/Views/Shared/_LoggedIn.cshtml";
 }
 
-<h2>Login</h2>
+<link href="~/Content/Account/login.css" rel="stylesheet"/>
 
+<div id="form">
+	<h2>Login</h2>
+	<div class="login-row">		
+		@Html.TextBoxFor(m => m.Username, new { @placeholder = "Username", @class = "login-input" })
+	</div>
+	<div class="login-row">
+		@Html.PasswordFor(m => m.Password, new { @placeholder = "Password", @class = "login-input" })
+	</div>
+	<div id="submit">Login</div>
+</div>
+
+<script src="~/Scripts/Account/Login.js"></script>
