@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using BudgetKeeper.Web.Models;
+using BudgetKeeper.Objects;
+using Newtonsoft;
 
 namespace BudgetKeeper.Web.Controllers {
 	public class AccountController : Controller {
@@ -18,7 +20,10 @@ namespace BudgetKeeper.Web.Controllers {
 			try {
 				conn = CommonFunctions.GetActiveUser(Request);
 				if (conn != null && conn.LoggedIn) {
-
+					User temp = (User)conn.PublicLoggedInUser;
+					temp.Parent = null;
+					
+					ViewBag.User = Newtonsoft.Json.JsonConvert.SerializeObject(temp);
 				}
 			}
 			catch (Exception ex) {

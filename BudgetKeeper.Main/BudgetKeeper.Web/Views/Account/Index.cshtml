@@ -22,6 +22,9 @@
 
 	@Scripts.Render("~/bundles/Libs")
 	@Scripts.Render("~/bundles/account")
+	<script>
+		init('@Html.Raw(ViewBag.User)');
+	</script>
 </body>
 </html>
 
