@@ -19,17 +19,17 @@ namespace BudgetKeeper.Web {
 						"~/Scripts/Account/settings.js",
 						"~/Scripts/Account/app.js"));
 
-			bundles.Add(new StyleBundle("~/Content/css").Include(
-					  "~/Content/bootstrap.css",
-					  "~/Content/site.css"));
+			bundles.Add(new StyleBundle("~/Styles/css").Include(
+					  "~/Styles/bootstrap.css",
+					  "~/Styles/site.css"));
 
-			bundles.Add(new StyleBundle("~/Content/pre-logged-in").Include(
-					  "~/Content/bootstrap.css",
-					  "~/Content/pre-logged-in.css"));
+			bundles.Add(new StyleBundle("~/Styles/pre-logged-in").Include(
+					  "~/Styles/bootstrap.css",
+					  "~/Styles/pre-logged-in.css"));
 
-			bundles.Add(new StyleBundle("~/Content/logged-in").Include(
-					  "~/Content/bootstrap.css",
-					  "~/Content/logged-in.css"));
+			bundles.Add(new StyleBundle("~/Styles/logged-in").Include(
+					  "~/Styles/bootstrap.css",
+					  "~/Styles/logged-in.css"));
 		}
 	}
 }

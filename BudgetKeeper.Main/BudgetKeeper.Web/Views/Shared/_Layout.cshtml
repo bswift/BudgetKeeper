@@ -4,16 +4,28 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - My ASP.NET Application</title>
-    @Styles.Render("~/Content/css")
+    @Styles.Render("~/Styles/css")
+	@Scripts.Render("~/bundles/Libs")
 </head>
 <body>
     <div class="header"></div>
 	<div class="body">
+		<div id="navMenu">
+			<div id="navTab"></div>
+			<div id="navItems">
+				<div class="navItem"><a href="~/Home/Index">Home</a></div>
+				<div class="navItem"><a href="~/Home/About">About</a></div>
+				<div class="navItem"><a href="~/Home/Contact">Contact</a></div>
+				<div id="accountNav">
+					<div class="navItem"><div id="login">Login</div></div>
+					<div class="navItem"><div id="signup">Signup</div></div>
+				</div>
+			</div>
+		</div>
 		@RenderBody()
 	</div>
 	<div class="footer"></div>
-
-    @Scripts.Render("~/bundles/Libs")
+	<script src="~/Scripts/Home/layout.js"></script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

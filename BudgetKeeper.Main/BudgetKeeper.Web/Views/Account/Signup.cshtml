@@ -1,0 +1,19 @@
+﻿@model BudgetKeeper.Web.Models.RegisterModel
+
+@{
+    ViewBag.Title = "Signup";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Styles/Account/signup.css" rel="stylesheet" />
+
+<div id="signup-form">
+	<div id="signup-title">Signup</div>
+	<div class="signup-field">@Html.TextBoxFor(m => m.Name, new { @placeholder = "Name" })</div>
+	<div class="signup-field">@Html.TextBoxFor(m => m.Username, new { @placeholder = "Username" })</div>
+	<div class="signup-field">@Html.TextBoxFor(m => m.Email, new { @placeholder = "Email" })</div>
+	<div class="signup-field">@Html.TextBoxFor(m => m.Phone, new { @placeholder = "Phone (optional)" })</div>
+	<div class="signup-field">@Html.PasswordFor(m => m.Password, new { @placeholder = "Password" })</div>
+	<div class="signup-field">@Html.Password("confirmPass", null, new { @placeholder = "Confirm Password" })</div>
+	<div><input id="signup-submit" type="button" value="submit" /></div>
+</div>
+<script src="~/Scripts/Account/signup.js"></script>

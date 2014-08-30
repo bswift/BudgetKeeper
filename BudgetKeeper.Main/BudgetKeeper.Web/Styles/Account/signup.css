@@ -1,0 +1,42 @@
+﻿input[type=text], input[type=password] {
+	border: 1px solid #dddddd;
+	padding: 5px;
+	border-radius: 3px;
+}
+
+#signup-form {
+	width: 500px;
+	margin: 40px auto;
+	text-align: center;
+	padding: 15px;
+	box-shadow: 0 3px 7px rgba(100, 100, 100, 1);
+	box-sizing: border-box;
+}
+
+#signup-title {
+	font-size: 18pt;
+	margin-bottom: 10px;
+}
+
+.signup-field {
+	margin: 10px auto;
+	font-size: 14pt;
+	width: 350px;
+	max-width: 100%;
+}
+
+#signup-submit {
+	border: 1px solid #0094ff;
+	background-color: #0094ff;
+	color: #ffffff;
+	border-radius: 3px;
+	-moz-transition-duration: 0.3s;
+	-webkit-transition-duration: 0.3s;
+	-o-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+}
+
+#signup-submit:hover {
+	background-color: #ffffff;
+	color: #0094ff;
+}

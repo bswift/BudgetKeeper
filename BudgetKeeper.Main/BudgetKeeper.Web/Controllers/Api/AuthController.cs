@@ -75,5 +75,14 @@ namespace BudgetKeeper.Web.Controllers.Api
 
 			return resp;
 		}
+
+		public ReturnJsonObject Signup(Signup model) {
+			ReturnJsonObject rjo = new ReturnJsonObject();
+
+			rjo.SetSuccessData("hello");
+
+			return rjo;
+		}
+
     }
 }

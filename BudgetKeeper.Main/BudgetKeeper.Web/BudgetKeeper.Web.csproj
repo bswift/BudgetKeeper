@@ -140,15 +140,18 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\Account\logged-in.css" />
-    <Content Include="Content\Account\Login.css" />
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
-    <Content Include="Content\pre-logged-in.css" />
+    <Content Include="Scripts\Account\signup.js" />
+    <Content Include="Scripts\Home\layout.js" />
+    <Content Include="Styles\Account\logged-in.css" />
+    <Content Include="Styles\Account\Login.css" />
+    <Content Include="Styles\Account\signup.css" />
+    <Content Include="Styles\bootstrap.css" />
+    <Content Include="Styles\bootstrap.min.css" />
+    <Content Include="Styles\pre-logged-in.css" />
     <Content Include="favicon.ico" />
-    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="Content\Site.css" />
+    <Content Include="Styles\Site.css" />
     <Content Include="Scripts\Account\app.js" />
     <Content Include="Scripts\Account\dashboard.js" />
     <Content Include="Scripts\Account\global.js" />
@@ -181,19 +184,19 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Scripts\Libs\jquery-1.10.2.min.map" />
     <Content Include="Views\Shared\_LoggedIn.cshtml" />
-    <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\settings.cshtml" />
     <Content Include="Views\Account\Index.cshtml" />
     <Content Include="Views\Account\dashboard.cshtml" />
+    <Content Include="Views\Account\Signup.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Fonts\glyphicons-halflings-regular.eot" />
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
   </ItemGroup>

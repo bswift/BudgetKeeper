@@ -23,7 +23,7 @@ namespace BudgetKeeper.Web.Controllers {
 			return View();
 		}
 
-		public ActionResult Register() {
+		public ActionResult Signup() {
 
 			return View();
 		}
