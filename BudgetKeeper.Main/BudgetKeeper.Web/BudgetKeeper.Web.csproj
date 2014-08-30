@@ -131,6 +131,7 @@
     <Compile Include="CodeFiles\CommonFunctions.cs" />
     <Compile Include="CodeFiles\CookieFactory.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\Api\AccountController.cs" />
     <Compile Include="Controllers\Api\AuthController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">

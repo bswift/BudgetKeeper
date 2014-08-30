@@ -17,7 +17,7 @@ namespace BudgetKeeper.Web.Models {
 		public string Password { get; set; }
 	}
 
-	public class Signup {
+	public class SignupModel {
 		public string Username { get; set; }
 		public string Password { get; set; }
 		public string Name { get; set; }

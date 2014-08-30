@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using BudgetKeeper.Objects;
 using BudgetKeeper.Web.Models;
 
 namespace BudgetKeeper.Web.Controllers.Api
@@ -74,14 +76,6 @@ namespace BudgetKeeper.Web.Controllers.Api
 			}
 
 			return resp;
-		}
-
-		public ReturnJsonObject Signup(Signup model) {
-			ReturnJsonObject rjo = new ReturnJsonObject();
-
-			rjo.SetSuccessData("hello");
-
-			return rjo;
 		}
 
     }

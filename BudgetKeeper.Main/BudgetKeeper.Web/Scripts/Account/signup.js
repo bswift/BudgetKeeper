@@ -1,7 +1,7 @@
 ﻿!function () {
 	$("#signup-submit").click(function () {
 		$.ajax({
-			url: "/Api/Auth/Signup",
+			url: "/Api/Account/Signup",
 			type: "POST",
 			contentType: "application/json",
 			data: JSON.stringify({
