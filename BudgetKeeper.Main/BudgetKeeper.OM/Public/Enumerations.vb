@@ -37,7 +37,7 @@
 	Enum LoginType
 		Unknown = -1
 		Admin = 1
-		Editor = 2
+		Owner = 2
 		Contributor = 3
 		Viewer = 4
 	End Enum
@@ -55,7 +55,7 @@
 	Enum UserType
 		Unknown = -1
 		Admin = 1
-		Editor = 2
+		Owner = 2
 		Contributor = 3
 		Viewer = 4
 	End Enum
@@ -63,6 +63,7 @@
 	Enum UserStatus
 		Unknown = -1
 		Active = 1
+		Pending = 2
 		Banned = 4
 		Deleted = 101
 	End Enum

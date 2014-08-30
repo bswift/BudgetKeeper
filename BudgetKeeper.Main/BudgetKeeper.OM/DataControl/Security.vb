@@ -16,32 +16,32 @@
 
 	Public Function SaveSecureObject(obj As Object) As Long
 		If m_LoginID = 0 Then Throw New Exception("Log in to save an object.")
-		If m_LoginType <> Enumerations.LoginType.Admin AndAlso m_LoginType <> Enumerations.LoginType.Editor Then Throw New Exception("You do not have permission to save.")
+		If m_LoginType <> Enumerations.LoginType.Admin AndAlso m_LoginType <> Enumerations.LoginType.Owner Then Throw New Exception("You do not have permission to save.")
 
 		Try
 			Select Case obj.ObjectType
 				Case Enumerations.ObjectType.User
-                    Return SaveUser(obj)
-                Case Enumerations.ObjectType.Entry
-                    Return SaveEntry(obj)
-                Case Enumerations.ObjectType.Location
-                    Return SaveLocation(obj)
-                Case Enumerations.ObjectType.Category
+					Return SaveUser(obj)
+				Case Enumerations.ObjectType.Entry
+					Return SaveEntry(obj)
+				Case Enumerations.ObjectType.Location
+					Return SaveLocation(obj)
+				Case Enumerations.ObjectType.Category
 					Return SaveCategory(obj)
 				Case Enumerations.ObjectType.Budget
 					Return SaveBudget(obj)
 				Case Else
 					Throw New Exception("Object not a valid type to save: " & obj.ObjectType.ToString())
 			End Select
-        Catch ex As Exception
-            Throw ex
-        End Try
-        Return 0
-    End Function
+		Catch ex As Exception
+			Throw ex
+		End Try
+		Return 0
+	End Function
 
-    Public Function SaveUser(ByVal obj As Objects.User) As Long
-        Dim objID As Long = 0
-		If m_LoginID <> 0  Then
+	Public Function SaveUser(ByVal obj As Objects.User) As Long
+		Dim objID As Long = 0
+		If m_LoginID <> 0 Then
 			If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginID = obj.UserID Then
 				Dim enc As New Encryption.AES
 				enc.IV = m_IV
@@ -49,6 +49,8 @@
 				If obj.UserID = 0 AndAlso obj.SaveID = 0 Then
 					obj.SetCreatedDate(DateTime.Now)
 					obj.SetLastLogin(CDate("01/01/2000"))
+					If obj.UserType = Enumerations.UserType.Unknown Then obj.UserType = Enumerations.UserType.Owner
+					If obj.Status = Enumerations.UserStatus.Unknown Then obj.Status = Enumerations.UserStatus.Active
 				End If
 				If Not String.IsNullOrEmpty(obj.Password) Then
 					obj.Password = enc.EncryptString(obj.Password)
@@ -60,13 +62,13 @@
 		Else
 			Throw New Exception("You must be logged in to save.")
 		End If
-        Return objID
-    End Function
+		Return objID
+	End Function
 
-    Public Function SaveEntry(ByVal obj As Objects.Entry) As Long
-        Dim objID As Long = 0
-        If m_LoginID <> 0 Then
-			If (m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor OrElse m_LoginType = Enumerations.LoginType.Contributor) Then
+	Public Function SaveEntry(ByVal obj As Objects.Entry) As Long
+		Dim objID As Long = 0
+		If m_LoginID <> 0 Then
+			If (m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Owner OrElse m_LoginType = Enumerations.LoginType.Contributor) Then
 				If m_LoginType = Enumerations.LoginType.Contributor Then
 					If obj.ID > 0 AndAlso obj.SaveID > 0 AndAlso m_LoginID <> obj.UserID Then
 						Throw New Exception("You are not authorized to modify this entry.")
@@ -78,40 +80,40 @@
 			Else
 				Throw New Exception("You are not authorized to save this entry.")
 			End If
-        Else
-            Throw New Exception("You must be logged in to save.")
-        End If
-        Return objID
-    End Function
+		Else
+			Throw New Exception("You must be logged in to save.")
+		End If
+		Return objID
+	End Function
 
-    Public Function SaveLocation(ByVal obj As Objects.Location) As Long
-        Dim objID As Long = 0
-        If m_LoginID <> 0 Then
-            If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor Then
-                objID = m_SQL.SaveObject_Location(obj)
-            End If
-        Else
-            Throw New Exception("You must be logged in to save.")
-        End If
-        Return objID
-    End Function
+	Public Function SaveLocation(ByVal obj As Objects.Location) As Long
+		Dim objID As Long = 0
+		If m_LoginID <> 0 Then
+			If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Owner Then
+				objID = m_SQL.SaveObject_Location(obj)
+			End If
+		Else
+			Throw New Exception("You must be logged in to save.")
+		End If
+		Return objID
+	End Function
 
-    Public Function SaveCategory(ByVal obj As Objects.Category) As Long
-        Dim objID As Long = 0
-        If m_LoginID <> 0 Then
-            If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor Then
-                objID = m_SQL.SaveObject_Category(obj)
-            End If
-        Else
-            Throw New Exception("You must be logged in to save.")
-        End If
-        Return objID
-    End Function
+	Public Function SaveCategory(ByVal obj As Objects.Category) As Long
+		Dim objID As Long = 0
+		If m_LoginID <> 0 Then
+			If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Owner Then
+				objID = m_SQL.SaveObject_Category(obj)
+			End If
+		Else
+			Throw New Exception("You must be logged in to save.")
+		End If
+		Return objID
+	End Function
 
 	Public Function SaveBudget(ByVal obj As Objects.Budget) As Long
 		Dim objID As Long = 0
 		If m_LoginID <> 0 Then
-			If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Editor Then
+			If m_LoginType = Enumerations.LoginType.Admin OrElse m_LoginType = Enumerations.LoginType.Owner Then
 				objID = m_SQL.SaveObject_Budget(obj)
 			End If
 		Else
@@ -257,10 +259,9 @@
     End Function
 
     Friend Function LoginGenericViaSession(ByVal SessionString As String, ByVal UserIP As String) As Object
-        Dim cleanEntity As Boolean = False ' preserves integrity of linq object in the case of inheritance
         Try
             Dim Values As String() = DecryptSessionString(SessionString)
-            If Values.Count <> 6 Then Return Nothing
+			If Values.Count < 5 Then Return Nothing
 
             Dim ThisID As Long = Values(0)
             Dim ThisType As Integer = Values(1)
@@ -271,7 +272,7 @@
 
             If ThisID < 1 Then Return Nothing ' Bad ID
             If String.IsNullOrEmpty(IP) Then Return Nothing ' No guid/id entered
-            If Not String.IsNullOrEmpty(UserIP) AndAlso IP <> UserIP Then Return Nothing ' Bad IP for cookie
+			If Not String.IsNullOrEmpty(UserIP) AndAlso IP <> UserIP Then Return Nothing ' Bad IP for cookie
             If SKey <> m_SALT Then Return Nothing ' bad salt value
             If Date.Compare(Now, FormedDate) > 0 Then Return Nothing ' expired session
 

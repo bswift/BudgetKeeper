@@ -93,7 +93,7 @@ public static class CommonFunctions {
 	public static BudgetKeeper.Connector GetConnector(string User, string Pass, BudgetKeeper.Enumerations.LoginType LType, string UserIP = "") {
 		BudgetKeeper.Connector Conn = new BudgetKeeper.Connector(ConnStr);
 		if (Conn != null) {
-			Conn.LogIn(User, Pass, "");
+			Conn.LogIn(User, Pass, UserIP);
 
 			if (Conn != null && Conn.LoggedIn) {
 				return Conn;
