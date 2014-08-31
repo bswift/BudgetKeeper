@@ -1,0 +1,87 @@
+html {
+	min-width: 100%;
+	min-height: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+body{
+	height: 100%;
+	width: 100%;
+	padding: 0;
+}
+
+
+/*--- Page Content ---*/
+.main {
+	width: 100%;
+}
+/*--- End Page Content ---*/
+.index-header {
+	width: 100%;
+	text-align: center;
+	margin: 20px auto;
+	font-size: 20pt;
+}
+
+#navMenu {
+	height: 100%;
+	background-color: #0094ff;
+	color: #FFFFFF;
+	text-align: center;
+	position: fixed;
+	top: 0;
+	left: -200px;
+	width: 200px;
+	box-shadow: 0 3px 10px rgba(100, 100, 100, 1);
+	z-index: 5;
+}
+
+#navTab {
+	position: fixed;
+	top: 45%;
+	background-color: #0094ff;
+	left: 0;
+	width: 20px;
+	height: 60px;
+	border-radius: 0 3px 3px 0;
+}
+
+#navItems {
+	font-size:20pt;
+	position: relative;
+	top: 38%;
+}
+
+.navItem {
+	margin: 10px auto;
+}
+	.navItem a {
+		color: #FFFFFF;
+		text-decoration: none;
+	}
+
+#accountNav {
+	width: 100px;
+	margin: auto;
+}
+
+#accountNav .navItem {
+	padding: 5px 0;
+	background-color: #666666;
+	border-radius: 4px;
+	cursor: pointer;
+	-moz-transition-duration: 0.3s;
+	-webkit-transition-duration: 0.3s;
+	-o-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+}
+
+#accountNav .navItem:hover {
+	background-color: #FFFFFF;
+	color: #0094ff;
+}
+
+/*--- Index ---*/
+
+/*--- End Index ---*/
